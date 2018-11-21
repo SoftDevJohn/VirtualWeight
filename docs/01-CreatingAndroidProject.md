@@ -1,4 +1,4 @@
-# Creating the basic Andriud App in Android Studio
+# Creating the basic Android App in Android Studio
 
 
 
@@ -97,7 +97,7 @@ After creating the following files:
 
 - README.md; 
 - ./docs; and 
-- ./docs/01-CreatingAndroid.md
+- ./docs/01-CreatingAndroidProject.md
 
 These new files are untracked and not under source control.
 
@@ -107,7 +107,7 @@ git add README.md
 
 git add ./docs
 
-git add ./docs/01-AddingThisProjectToGithub.md
+git add ./docs/01-CreatingAndroidProject.md
 
 These files are now tracked and ready to be committed to the local file system.
 
