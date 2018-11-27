@@ -47,9 +47,35 @@ This generates the following files:
 
 
 
+### Running the App in an Emulator on an AVD (Android Virtual Device)
+
 Select "app" in the project window.
 Android Studio>Run>Run app>
 Available Virtual Device>Pixel XL API 25>Ok
+
+
+
+### Running the App on a real Device
+
+Ensure USB Debugging is enabled on the device.
+
+Connect the device
+
+A notification, "Android System * USB Charging this device ", tap on this and change it to (*) Transfer files. 
+
+*(The Device name should appear in the File Manager. e.g. "ONEPLUS A3003")*
+
+
+
+Android Studio>Run>Run App>Motorola Moto C Plus (Android 8.0.0, API 26)
+
+*The first time, the following message will appear:*
+
+*Instant Run requires that the platform corresponding to your device (Android 8.0 (Oreo)) is installed.*
+
+*Select Install and Continue*
+
+The App now appears on the Phone.
 
 
 
