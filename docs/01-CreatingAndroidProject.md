@@ -98,7 +98,7 @@ https://github.com/ > New Repository
 
 cd C:\dev\VirtualWeight
 git init
-{this creates an empty local repository .gitin the current directory}
+{this creates an empty local repository .git in the current directory}
 
 ##### Add the files to GIT
 
