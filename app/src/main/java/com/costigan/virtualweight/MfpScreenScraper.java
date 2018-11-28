@@ -29,12 +29,12 @@ public class MfpScreenScraper {
 
         try {
             //try logging in
-            String url = SecureConstants.URL_LOGIN;
+            String url = VwConstants.URL_LOGIN;
 
             Connection.Response res = Jsoup
                     .connect(url)
-                    .data("username", SecureConstants.USERNAME )
-                    .data("password", SecureConstants.PASSWORD )
+                    .data("username",  VwConstants.USERNAME )
+                    .data("password", VwConstants.PASSWORD )
                     .method(Connection.Method.POST)
                     .execute();
 
@@ -100,12 +100,12 @@ public class MfpScreenScraper {
 
         try {
             //try logging in
-            String url = SecureConstants.URL_LOGIN;
+            String url = VwConstants.URL_LOGIN;
 
             Connection.Response res = Jsoup
                     .connect(url)
-                    .data("username", SecureConstants.USERNAME )
-                    .data("password", SecureConstants.PASSWORD )
+                    .data("username", VwConstants.USERNAME )
+                    .data("password", VwConstants.PASSWORD )
                     .method(Connection.Method.POST)
                     .execute();
 
@@ -155,7 +155,7 @@ public class MfpScreenScraper {
 
     @NonNull
     private String getUrl() {
-        return SecureConstants.URL_QUERY+SecureConstants.USERNAME+"?from=2018-10-29&to=2018-10-29";
+        return VwConstants.URL_QUERY+VwConstants.USERNAME+"?from=2018-10-29&to=2018-10-29";
     }
 
 }
