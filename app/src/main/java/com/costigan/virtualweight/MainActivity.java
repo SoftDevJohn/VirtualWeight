@@ -1,6 +1,7 @@
 package com.costigan.virtualweight;
 
 import android.content.Intent;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,12 +9,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.content.Context;
 
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.util.List;
+import java.util.Map;
 
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 import static com.costigan.virtualweight.VwFileManager.SETTINGS_FILE;
@@ -27,11 +36,35 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-
     /**
      * Called when the user taps the Weigh In button
      */
     public void changeSettings(View view) {
+
+
+
+        //TODO: Build an input screen for these settings which will read in the existing settings
+        //and then allow them to be changed and then write them back out
+        //For moment, leave it hardcoded
+        TextView statusTextView = findViewById(R.id.statusTextView);
+
+       //Network operations should be running in a seperate thread
+        //But this hack will allows us to develop and test it here
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        //End Hack
+
+        MfpScreenScraper mpfSc = new MfpScreenScraper();
+        mpfSc.screenScrape( statusTextView );
+
+    }
+
+
+
+    /**
+     * Called when the user taps the Weigh In button
+     */
+    public void changeSettingsWORKS(View view) {
 
         //TODO: Build an input screen for these settings which will read in the existing settings
         //and then allow them to be changed and then write them back out
