@@ -32,22 +32,17 @@ public class MfpScreenScraperTest {
         //returns the 26-oct
         LocalDate dayAfterStartDate = vws.getDayAfterStartDate();
 
-        String octDate = "2018-10-29";
-        LocalDate date = org.joda.time.LocalDate.parse(octDate, TodaysCalories.DATE_FORMATTER);
+        String endDateStr = "2018-11-30";
+        LocalDate endDate = org.joda.time.LocalDate.parse(endDateStr, TodaysCalories.DATE_FORMATTER);
         MfpScreenScraper mpfSc = new MfpScreenScraper();
-        //TodaysCalories tc = mpfSc.getCaloriesForDate(date);
-        //assertEquals(153499, tc.getCaloriesIn());
 
-        //List<TodaysCalories> tc = mpfSc.getCaloriesForDates(date,date);
-        //todo:
-        //1) Get calories between the given dates inclusive
-        //2) Scan list for latest date before today and save that back into the configuraion fule
+        TotalCalories total = mpfSc.getTotalCaloriesDateToToday(vws.getDayAfterStartDate());
 
+        assertEquals(153499, total.getNetCalories(2625));
+
+//        assertEquals(153499, total.getNetWeight(vws.getBmr(),vws.getStartWeight()),0.001);
 
 
-
-
-        assertEquals(153499, "tc.getCaloriesIn()");
 
 
 

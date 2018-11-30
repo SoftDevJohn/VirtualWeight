@@ -52,6 +52,16 @@ public class WeightResultDto {
         return getBmr() * getFractionOfDay();
     }
 
+    /**
+     * @return the fraction of the day accurate to three decimal places, which is about to the minute
+     */
+    public static double getFractionOfDay() {
+        double d = getSecondsSinceMidnight() / (double)86400000;
+        return getRoundedValue(d,3);
+    }
+
+
+
     public String getBmrSinceMidnightAsString(){
         return String.format("%d", (int)getBmrSinceMidnight());
     }
@@ -120,13 +130,6 @@ public class WeightResultDto {
         return now.getTimeInMillis() - midnight.getTimeInMillis();
     }
 
-    /**
-     * @return the fraction of the day accurate to three decimal places, which is about to the minute
-     */
-    public static double getFractionOfDay() {
-        double d = getSecondsSinceMidnight() / (double)86400000;
-        return getRoundedValue(d,3);
-    }
 
     public static double getRoundedValue(double d, int places) {
         double scale = Math.pow(10, places);

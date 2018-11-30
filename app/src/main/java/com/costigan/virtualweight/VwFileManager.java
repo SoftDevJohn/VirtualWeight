@@ -15,7 +15,7 @@ public class VwFileManager {
 
     public void writeSettings(Context ctx, String fileName, VwSettings settings) throws Exception {
         FileOutputStream fos = ctx.openFileOutput(fileName, Context.MODE_PRIVATE);
-        fos.write(settings.toString().getBytes());
+        fos.write(settings.toWriteLine().getBytes());
         fos.close();
     }
 

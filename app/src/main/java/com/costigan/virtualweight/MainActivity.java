@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.content.Context;
 
+import org.joda.time.LocalDate;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Called when the user taps the Weigh In button
      */
-    public void changeSettingsWORKS(View view) {
+    public void changeSettings(View view) {
 
         //TODO: Build an input screen for these settings which will read in the existing settings
         //and then allow them to be changed and then write them back out
@@ -55,8 +56,13 @@ public class MainActivity extends AppCompatActivity {
             VwSettings settings = new VwSettings();
             settings.setUserName("mfpuseranme3");
             settings.setPassword("mfppw3");
-            settings.setBmr(26903);
-            settings.setTargetWeight(79.43);
+            settings.setBmr(2625);
+
+            //The last official way-in, on subsequent days the weight is calculated based on caloroes
+            LocalDate startDate = org.joda.time.LocalDate.parse("2018-11-26", TodaysCalories.DATE_FORMATTER);
+            settings.setStartDate(startDate);
+            settings.setStartWeight(85.2);
+            settings.setTargetWeight(83.5);
             //fm.writeFile(ctx, SETTINGS_FILE, settings.toString());
 
             fm.writeSettings(ctx, SETTINGS_FILE, settings);
@@ -137,23 +143,36 @@ public class MainActivity extends AppCompatActivity {
         //End Hack
         MfpScreenScraper mpfSc = new MfpScreenScraper();
         try {
-            TodaysCalories tc = mpfSc.getCaloriesForToday();
-            caloriesInTextView.setText(String.valueOf(tc.getCaloriesIn()));
-            caloriesOutTextView.setText(String.valueOf(tc.getCaloriesOut()));
-            netCaloriesTextView.setText(String.valueOf(tc.getNetCalories()));
-            netWeightTextView.setText(String.valueOf((double) tc.getNetCalories() / (double) 7700));
-            double currentWeight = 85.1 + ((tc.getCaloriesIn() - tc.getCaloriesOut() - dto.getBmrSinceMidnight())) / 7700;
-            ;
-            weightResultTextView.setText(String.valueOf(currentWeight));
+            VwFileManager fm = new VwFileManager();
 
-            statusTextView.setText("TC=" + tc);
+            //Now read from this file
+            StringBuffer stringBuffer = new StringBuffer();
+            Context ctx = getApplicationContext();
+            fm.readFile(ctx, VwFileManager.SETTINGS_FILE, stringBuffer);
+            VwSettings vws = new VwSettings(stringBuffer.toString().trim());
+
+            LocalDate dayAfterStartDate = vws.getDayAfterStartDate();
+            TotalCalories total = mpfSc.getTotalCaloriesDateToToday(vws.getDayAfterStartDate());
+
+            weightResultTextView.setText(String.valueOf( total.getNetWeight(vws.getBmr(),vws.getStartWeight() ) ) );
+            bmrTextView.setText(String.valueOf( total.getBmrSinceMidnight(vws.getBmr()) ) );
+
+
+            caloriesInTextView.setText(String.valueOf( total.getTotalCaloriesIn() ));
+            caloriesOutTextView.setText(String.valueOf(total.getTotalCaloriesOut()));
+            netCaloriesTextView.setText(String.valueOf(total.getNetCalories( vws.getBmr() )));
+            netWeightTextView.setText(String.valueOf( total.getNetWeightChange(vws.getBmr())));
+
+
+
+            statusTextView.setText("TC=" + total);
 
         } catch (Exception ex) {
             statusTextView.setText("Ex=" + ex);
         }
-
+/*
         bmrTextView.setText(dto.getBmrSinceMidnightAsString());
-
+*/
 
     }
 
