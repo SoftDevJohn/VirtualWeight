@@ -41,6 +41,14 @@ public class TodaysCalories {
         return caloriesIn;
     }
 
+    public int getNetCalories() {
+        return caloriesIn-caloriesOut;
+    }
+
+    public double getNetWeight() {
+        return getNetCalories()/7700;
+    }
+
     public void setCaloriesIn(int caloriesIn) {
         this.caloriesIn = caloriesIn;
     }
@@ -53,5 +61,12 @@ public class TodaysCalories {
         this.caloriesOut = caloriesOut;
     }
 
-
+    @Override
+    public String toString() {
+        return "TodaysCalories{" +
+                "date=" + date +
+                ", caloriesIn=" + caloriesIn +
+                ", caloriesOut=" + caloriesOut +
+                '}';
+    }
 }

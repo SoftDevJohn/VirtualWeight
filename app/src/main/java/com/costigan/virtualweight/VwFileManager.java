@@ -15,10 +15,18 @@ public class VwFileManager {
 
     public void writeSettings(Context ctx, String fileName, VwSettings settings) throws Exception {
         FileOutputStream fos = ctx.openFileOutput(fileName, Context.MODE_PRIVATE);
-        fos.write(settings.toString().getBytes());
+        fos.write(settings.toWriteLine().getBytes());
         fos.close();
     }
 
+    public void writeFile(Context ctx, String fileName, VwSettings settings) throws Exception {
+        String ConfigurationLine = settings.toWriteLine();
+        writeFile(ctx, fileName, ConfigurationLine);
+
+    }
+
+    @Deprecated
+    //TODO make private
     public void writeFile(Context ctx, String fileName, String line) throws Exception {
         FileOutputStream fos = ctx.openFileOutput(fileName, Context.MODE_PRIVATE);
         fos.write(line.getBytes());
@@ -37,7 +45,5 @@ public class VwFileManager {
         }
         return inputString;
     }
-
-
 
 }
