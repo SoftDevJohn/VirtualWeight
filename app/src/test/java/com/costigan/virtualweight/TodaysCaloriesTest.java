@@ -1,5 +1,6 @@
 package com.costigan.virtualweight;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -11,6 +12,21 @@ import static org.junit.Assert.*;
 
 public class TodaysCaloriesTest {
 
+
+    @Test
+    public void convertAmericanDate() {
+        String americanDate = "october 29, 2018";
+        DateTimeFormatter dtf = DateTimeFormat.forPattern("MMMM dd, YYYY");
+        LocalDate dt = org.joda.time.LocalDate.parse(americanDate, dtf);
+
+        //LocalDate today = org.joda.time.LocalDate.now();
+        LocalDate today = new LocalDate(2018,10,29);
+
+        //assertEquals("2018-10-29", dt.toString());
+        assertEquals(today, dt);
+
+
+    }
 
     @Test
     public void setDate() {

@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Called when the user taps the Weigh In button
      */
-    public void calculateWeight(View view) {
+    public void TESTINGcalculateWeight(View view) {
         TextView statusTextView = findViewById(R.id.statusTextView);
         try {
 
@@ -129,10 +129,13 @@ public class MainActivity extends AppCompatActivity {
 
 
     /** Called when the user taps the Weigh In button */
-    public void calculateWeightWORKING(View view) {
+    public void calculateWeight(View view) {
+        TextView statusTextView = findViewById(R.id.statusTextView);
+
         VirtualWeight vw = new VirtualWeight();
         vw.calcuateWeight();
         WeightResultDto dto = vw.getWeight();
+
 
         // Do something in response to button
         /*
@@ -143,29 +146,55 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(WEIGHT_RESULT, weightResult);
         startActivity(intent);
         */
+
+
+
+
         TextView weightResultTextView = findViewById(R.id.weightResultTextView);
         TextView bmrTextView = findViewById(R.id.bmrTextView);
         TextView caloriesOutTextView = findViewById(R.id.caloriesOutTextView);
         TextView caloriesInTextView = findViewById(R.id.caloriesInTextView);
         TextView netCaloriesTextView = findViewById(R.id.netCaloriesTextView);
         TextView netWeightTextView = findViewById(R.id.netWeightTextView);
-        TextView statusTextView = findViewById(R.id.statusTextView);
+        //TextView statusTextView = findViewById(R.id.statusTextView);
 
-        weightResultTextView.setText(dto.getCurrentWeightAsString());
+        //Network operations should be running in a seperate thread
+        //But this hack will allows us to develop and test it here
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        //End Hack
+        MfpScreenScraper mpfSc = new MfpScreenScraper();
+        try {
+            TodaysCalories tc = mpfSc.getCaloriesForToday();
+            caloriesInTextView.setText( String.valueOf( tc.getCaloriesIn()) );
+            caloriesOutTextView.setText( String.valueOf( tc.getCaloriesOut()) );
+            netCaloriesTextView.setText( String.valueOf( tc.getNetCalories() )  );
+            netWeightTextView.setText( String.valueOf( (double)tc.getNetCalories() / (double)7700 ) );
+            double currentWeight = 85.1 + (( tc.getCaloriesIn()-tc.getCaloriesOut()-dto.getBmrSinceMidnight()))/7700;;
+            weightResultTextView.setText( String.valueOf( currentWeight) );
+
+            statusTextView.setText("TC="+tc);
+
+        }catch(Exception ex){
+            statusTextView.setText("Ex="+ex);
+        }
+
+
+
 
         bmrTextView.setText(dto.getBmrSinceMidnightAsString());
-        caloriesOutTextView.setText(dto.getCaloriesOutAsString());
-        caloriesInTextView.setText(dto.getCaloriesInAsString());
-        netCaloriesTextView.setText(dto.getNetCaloriesSinceMidnightAsString());
-        netWeightTextView.setText(dto.getWeightChangeSinceMidnightAsString());
 
 
 
-        statusTextView.setText("Finished calculation");
 
 
     }
 
+
+    double calcuateWeight(int weight, double bmr, int in, int out){
+        return weight + (in-out-bmr)/7700;
+
+    }
 
 
     }
