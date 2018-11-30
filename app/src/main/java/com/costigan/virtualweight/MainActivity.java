@@ -154,15 +154,14 @@ public class MainActivity extends AppCompatActivity {
             LocalDate dayAfterStartDate = vws.getDayAfterStartDate();
             TotalCalories total = mpfSc.getTotalCaloriesDateToToday(vws.getDayAfterStartDate());
 
-            weightResultTextView.setText(String.valueOf( total.getNetWeight(vws.getBmr(),vws.getStartWeight() ) ) );
-            bmrTextView.setText(String.valueOf( total.getBmrSinceMidnight(vws.getBmr()) ) );
+            weightResultTextView.setText(String.valueOf(total.getNetWeight(vws.getBmr(), vws.getStartWeight())));
+            bmrTextView.setText(String.valueOf(total.getBmrSinceMidnight(vws.getBmr())));
 
 
-            caloriesInTextView.setText(String.valueOf( total.getTotalCaloriesIn() ));
+            caloriesInTextView.setText(String.valueOf(total.getTotalCaloriesIn()));
             caloriesOutTextView.setText(String.valueOf(total.getTotalCaloriesOut()));
-            netCaloriesTextView.setText(String.valueOf(total.getNetCalories( vws.getBmr() )));
-            netWeightTextView.setText(String.valueOf( total.getNetWeightChange(vws.getBmr())));
-
+            netCaloriesTextView.setText(String.valueOf(total.getNetCalories(vws.getBmr())));
+            netWeightTextView.setText(String.valueOf(total.getNetWeightChange(vws.getBmr())));
 
 
             statusTextView.setText("TC=" + total);
