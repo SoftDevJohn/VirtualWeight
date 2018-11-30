@@ -39,31 +39,6 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Called when the user taps the Weigh In button
      */
-    public void changeSettings(View view) {
-
-
-
-        //TODO: Build an input screen for these settings which will read in the existing settings
-        //and then allow them to be changed and then write them back out
-        //For moment, leave it hardcoded
-        TextView statusTextView = findViewById(R.id.statusTextView);
-
-       //Network operations should be running in a seperate thread
-        //But this hack will allows us to develop and test it here
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-        //End Hack
-
-        MfpScreenScraper mpfSc = new MfpScreenScraper();
-        mpfSc.screenScrape( statusTextView );
-
-    }
-
-
-
-    /**
-     * Called when the user taps the Weigh In button
-     */
     public void changeSettingsWORKS(View view) {
 
         //TODO: Build an input screen for these settings which will read in the existing settings
@@ -91,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
             statusTextView.setText("Ex: " + ex);
 
         }
-
 
 
     }
@@ -123,12 +97,12 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
-
     }
 
 
-    /** Called when the user taps the Weigh In button */
+    /**
+     * Called when the user taps the Weigh In button
+     */
     public void calculateWeight(View view) {
         TextView statusTextView = findViewById(R.id.statusTextView);
 
@@ -148,8 +122,6 @@ public class MainActivity extends AppCompatActivity {
         */
 
 
-
-
         TextView weightResultTextView = findViewById(R.id.weightResultTextView);
         TextView bmrTextView = findViewById(R.id.bmrTextView);
         TextView caloriesOutTextView = findViewById(R.id.caloriesOutTextView);
@@ -166,36 +138,27 @@ public class MainActivity extends AppCompatActivity {
         MfpScreenScraper mpfSc = new MfpScreenScraper();
         try {
             TodaysCalories tc = mpfSc.getCaloriesForToday();
-            caloriesInTextView.setText( String.valueOf( tc.getCaloriesIn()) );
-            caloriesOutTextView.setText( String.valueOf( tc.getCaloriesOut()) );
-            netCaloriesTextView.setText( String.valueOf( tc.getNetCalories() )  );
-            netWeightTextView.setText( String.valueOf( (double)tc.getNetCalories() / (double)7700 ) );
-            double currentWeight = 85.1 + (( tc.getCaloriesIn()-tc.getCaloriesOut()-dto.getBmrSinceMidnight()))/7700;;
-            weightResultTextView.setText( String.valueOf( currentWeight) );
+            caloriesInTextView.setText(String.valueOf(tc.getCaloriesIn()));
+            caloriesOutTextView.setText(String.valueOf(tc.getCaloriesOut()));
+            netCaloriesTextView.setText(String.valueOf(tc.getNetCalories()));
+            netWeightTextView.setText(String.valueOf((double) tc.getNetCalories() / (double) 7700));
+            double currentWeight = 85.1 + ((tc.getCaloriesIn() - tc.getCaloriesOut() - dto.getBmrSinceMidnight())) / 7700;
+            ;
+            weightResultTextView.setText(String.valueOf(currentWeight));
 
-            statusTextView.setText("TC="+tc);
+            statusTextView.setText("TC=" + tc);
 
-        }catch(Exception ex){
-            statusTextView.setText("Ex="+ex);
+        } catch (Exception ex) {
+            statusTextView.setText("Ex=" + ex);
         }
-
-
-
 
         bmrTextView.setText(dto.getBmrSinceMidnightAsString());
 
 
-
-
-
     }
 
-
-    double calcuateWeight(int weight, double bmr, int in, int out){
-        return weight + (in-out-bmr)/7700;
-
+    double calcuateWeight(int weight, double bmr, int in, int out) {
+        return weight + (in - out - bmr) / 7700;
     }
-
-
-    }
+}
 

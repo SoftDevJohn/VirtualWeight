@@ -3,6 +3,7 @@ package com.costigan.virtualweight;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
+import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,6 +12,8 @@ import static org.junit.Assert.*;
 
 public class VwFileManagerTest {
     private static VwSettings settings = new VwSettings();
+
+
 
     /**
      * Write configuration information the file
@@ -22,20 +25,16 @@ public class VwFileManagerTest {
         Context ctx = InstrumentationRegistry.getTargetContext();
         VwFileManager fm = new VwFileManager();
 
+        LocalDate startDate = new LocalDate(2018,10,25);
+
         settings.setUserName("myusername");
         settings.setPassword("mypassword");
         settings.setBmr(2690);
+        settings.setStartDate(startDate);
+        settings.setStartWeight(79.4);
         settings.setTargetWeight(79.4);
 
-        //String mfpUserName = "myusername";
-        //String mfpPassword = "mypassword";
-        //String bmr = "2690";
-        //String targetWeight = "79.4";
-        //String ConfigurationLine = mfpUserName+","+mfpPassword+","+bmr+","+targetWeight;
-        String ConfigurationLine = settings.toString();
-
-
-        fm.writeFile(ctx, VwFileManager.SETTINGS_FILE, ConfigurationLine);
+        fm.writeFile(ctx, VwFileManager.SETTINGS_FILE, settings);
 
     }
 
@@ -51,8 +50,8 @@ public class VwFileManagerTest {
         //Now read from this file
         StringBuffer stringBuffer = new StringBuffer();
         fm.readFile(ctx, VwFileManager.SETTINGS_FILE, stringBuffer);
-
-        assertEquals(settings.toString(), stringBuffer.toString().trim());
+        VwSettings vws = new VwSettings(stringBuffer.toString().trim());
+        assertEquals(settings, vws);
 
     }
 

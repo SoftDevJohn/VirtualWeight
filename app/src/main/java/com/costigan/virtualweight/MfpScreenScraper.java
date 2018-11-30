@@ -1,9 +1,8 @@
 package com.costigan.virtualweight;
+
 import android.os.Debug;
 import android.support.annotation.NonNull;
-import android.widget.TextView;
 
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -25,92 +24,6 @@ public class MfpScreenScraper {
 
         LocalDate date = org.joda.time.LocalDate.now();
         return getCaloriesForDate(date);
-    }
-
-    @Deprecated
-    public TodaysCalories getCaloriesForDateXX(LocalDate searchDate) {
-        TodaysCalories tc = new TodaysCalories();
-        tc.setDate(searchDate);
-//        tc.setCaloriesIn(1534);
-        tc.setCaloriesOut(702);
-
-        try {
-            //try logging in
-            String url = VwConstants.URL_LOGIN;
-
-            Connection.Response res = Jsoup
-                    .connect(url)
-                    .data("username",  VwConstants.USERNAME )
-                    .data("password", VwConstants.PASSWORD )
-                    .method(Connection.Method.POST)
-                    .execute();
-
-            Document doc = res.parse();
-
-            Map<String, String> cookies = res.cookies();
-
-
-            //TODO
-            Document doc2 = Jsoup
-                    .connect(getUrl(searchDate))
-                    .cookies(cookies)
-                    .get();
-
-            //See https://data-lessons.github.io/library-webscraping-DEPRECATED/02-csssel/
-            Elements totalElement = doc2.select("tfoot tr > :nth-child(2)");
-
-            //TODO: Add in error handling
-
-            List totalList = totalElement.eachText();
-            String totalString = (String)totalList.get(0);
-            totalString = totalString.replace(",","");
-            int  totalInt = Integer.parseInt(totalString);
-            tc.setCaloriesIn(totalInt);
-
-            //This works perfectly to here
-            //TODO
-            //1) Choose a fixed past date in mfp with known values
-            //2) Move the HTML code out if here into MfpScreenScraper
-            //3) Cam I parameterise out the username,passowrd and url to a file that isn;t uploaded to git
-            //4) Create a Junit to run these tests
-            //5) Sort out threading
-
-
-        } catch (Exception ex) {
-            return null;
-        }
-
-
-
-
-
-
-
-        return tc;
-    }
-
-
-
-    public void screenScrape() {
-        screenScrape(null);
-
-    }
-
-
-    @Deprecated
-    public void screenScrape(TextView statusTextView) {
-//        LocalDate searchDate = new LocalDate(2018,10,27);
-        LocalDate searchDate = new LocalDate(2018, 10, 29);
-        try {
-            TodaysCalories tc = getCaloriesForDate(searchDate);
-            statusTextView.setText("Calories today = "+tc);
-        } catch (Exception ex) {
-            statusTextView.setText("ex=" + ex);
-            if (statusTextView != null) {
-            }
-
-        }
-
     }
 
     /**
@@ -140,10 +53,10 @@ public class MfpScreenScraper {
                 .get();
 
         //See https://data-lessons.github.io/library-webscraping-DEPRECATED/02-csssel/
-
         //Scrape te Date
         Elements dateElement = doc2.select("h2[id=date]");
 
+        //Scrape the date
         //If we dont have at least a date, then something went wrong
         //The date should also be the date that was searched for
         if (dateElement.size() != 0) {
@@ -166,7 +79,6 @@ public class MfpScreenScraper {
         }
 
         //Scrape the Calories In
-
         Elements caloriesInElement = doc2.select("table[id=food] > tfoot tr > :nth-child(2)");
         if (caloriesInElement.size() != 0) {
             List caloriesInList = caloriesInElement.eachText();
@@ -177,7 +89,6 @@ public class MfpScreenScraper {
         } else {
             todaysCalories.setCaloriesIn(0);
         }
-
 
         //Scrape scalories ut
         Elements caloriesOutElement = doc2.select("#excercise > tfoot tr > :nth-child(2)");
@@ -199,7 +110,7 @@ public class MfpScreenScraper {
 
         String mfpDate = searchDate.toString(MFP_DATE_FORMAT);
 //        return VwConstants.URL_QUERY+VwConstants.USERNAME+"?from=2018-10-29&to=2018-10-29";
-        return VwConstants.URL_QUERY+VwConstants.USERNAME+"?from="+mfpDate+"&to="+mfpDate;
+        return VwConstants.URL_QUERY + VwConstants.USERNAME + "?from=" + mfpDate + "&to=" + mfpDate;
     }
 
     private LocalDate getDateFromAmericanDateString(String americanDate) {
