@@ -1,5 +1,6 @@
 package com.costigan.virtualweight;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -40,7 +41,45 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Called when the user taps the Weigh In button
      */
+
+
     public void changeSettings(View view) {
+
+        //Open the Settings Screem
+        Intent intent = new Intent(this, DisplaySettingsActivity.class);
+        //EditText editText = (EditText) findViewById(R.id.editText);
+        //String message = editText.getText().toString();
+        VwSettings settings = new VwSettings();
+        settings.setUserName("MyUsrName");
+
+        String message = "My message";
+        intent.putExtra("VW_SETTINGS", settings);
+        //startActivity(intent);
+        startActivityForResult(intent,1);
+
+
+    }
+
+    //Handle the results from the Update settings dialog
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        TextView statusTextView = findViewById(R.id.statusTextView);
+
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                //String result=intent.getStringExtra("result");
+                VwSettings settings = (VwSettings)intent.getSerializableExtra("VW_SETTINGS_RETURNED");
+                statusTextView.setText(settings.getUserName());
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+                statusTextView.setText("Cancelled");
+            }
+        }
+    }//onActivityResult
+
+
+    public void KEEPchangeSettings(View view) {
 
         //TODO: Build an input screen for these settings which will read in the existing settings
         //and then allow them to be changed and then write them back out

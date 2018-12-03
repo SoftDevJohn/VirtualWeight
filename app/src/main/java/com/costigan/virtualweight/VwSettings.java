@@ -5,11 +5,14 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.io.Serializable;
+
 /**
  *
  * File Format: username,password,bmr,startDate,startWeight,targetWeight
  */
-public class VwSettings {
+public class VwSettings implements Serializable {
+    //Implements serializable so we  can pass this object in Intents
 
     String userName = "";
     String password = "";
