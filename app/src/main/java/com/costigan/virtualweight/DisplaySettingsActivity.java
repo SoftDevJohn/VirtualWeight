@@ -20,7 +20,7 @@ public class DisplaySettingsActivity extends AppCompatActivity {
         VwSettings settings = (VwSettings)intent.getSerializableExtra("VW_SETTINGS");
 
         String message = settings.getUserName();
-        EditText et = findViewById(R.id.userNameEditText);
+        EditText et = findViewById(R.id.usernameEditText);
         et.setText(message);
 
 
@@ -29,7 +29,7 @@ public class DisplaySettingsActivity extends AppCompatActivity {
     public void updateSettings(View view) {
         Intent returnIntent = new Intent();
 
-        EditText et = findViewById(R.id.userNameEditText);
+        EditText et = findViewById(R.id.usernameEditText);
         VwSettings updatedSettings = new VwSettings();
         updatedSettings.setUserName(et.getText().toString());
         returnIntent.putExtra("VW_SETTINGS_RETURNED",updatedSettings);
