@@ -49,13 +49,25 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, DisplaySettingsActivity.class);
         //EditText editText = (EditText) findViewById(R.id.editText);
         //String message = editText.getText().toString();
-        VwSettings settings = new VwSettings();
-        settings.setUserName("MyUsrName");
+        try {
+            //String MY_FILE_NAME = "mytextfile.txt";
 
-        String message = "My message";
-        intent.putExtra("VW_SETTINGS", settings);
-        //startActivity(intent);
-        startActivityForResult(intent,1);
+            Context ctx = getApplicationContext();
+            VwFileManager fm = new VwFileManager();
+
+            VwSettings settings = new VwSettings();
+            //settings.setUserName("MyUsrName");
+            fm.getSettingsFromFile(ctx, SETTINGS_FILE, settings);
+
+            String message = "My message";
+            intent.putExtra("VW_SETTINGS", settings);
+            //startActivity(intent);
+            startActivityForResult(intent, 1);
+        } catch (Exception ex) {
+            TextView statusTextView = findViewById(R.id.statusTextView);
+            statusTextView.setText("Ex: " + ex);
+
+        }
 
 
     }
@@ -69,7 +81,15 @@ public class MainActivity extends AppCompatActivity {
             if(resultCode == Activity.RESULT_OK){
                 //String result=intent.getStringExtra("result");
                 VwSettings settings = (VwSettings)intent.getSerializableExtra("VW_SETTINGS_RETURNED");
-                statusTextView.setText(settings.getUserName());
+                statusTextView.setText("Settings are:" + settings.toString());
+                Context ctx = getApplicationContext();
+                VwFileManager fm = new VwFileManager();
+                try {
+                   fm.writeSettings(ctx, SETTINGS_FILE, settings);
+                } catch (Exception ex) {
+                    statusTextView.setText("Ex: " + ex);
+               }
+
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
@@ -93,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
             VwFileManager fm = new VwFileManager();
 
             VwSettings settings = new VwSettings();
+
             settings.setUserName("mfpuseranme3");
             settings.setPassword("mfppw3");
             settings.setBmr(2625);

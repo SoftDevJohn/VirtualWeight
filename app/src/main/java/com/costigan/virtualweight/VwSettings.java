@@ -51,7 +51,7 @@ public class VwSettings implements Serializable {
         return settings;
     }
 
-    private static void parseLine(VwSettings settings,String line) throws Exception{
+    public static void parseLine(VwSettings settings,String line) throws Exception{
         //Parse the string into this object
         String[] fields = line.split(",");
         if( fields.length != 6){
@@ -122,6 +122,14 @@ public class VwSettings implements Serializable {
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
+    public void setStartDateASYYYYMMMDD(String string) {
+        //String string = "2018-10-29";
+        LocalDate date = org.joda.time.LocalDate.parse(string, TodaysCalories.DATE_FORMATTER);
+        setStartDate(date);
+    }
+
+
+
 
     public double getStartWeight() {
         return startWeight;
@@ -130,6 +138,8 @@ public class VwSettings implements Serializable {
     public void setStartWeight(double startWeight) {
         this.startWeight = startWeight;
     }
+
+
 
 
     public String toWriteLine() {
