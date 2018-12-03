@@ -49,11 +49,11 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, DisplaySettingsActivity.class);
         //EditText editText = (EditText) findViewById(R.id.editText);
         //String message = editText.getText().toString();
+        Context ctx = getApplicationContext();
+        VwFileManager fm = new VwFileManager();
         try {
             //String MY_FILE_NAME = "mytextfile.txt";
 
-            Context ctx = getApplicationContext();
-            VwFileManager fm = new VwFileManager();
 
             VwSettings settings = new VwSettings();
             //settings.setUserName("MyUsrName");
@@ -63,6 +63,28 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("VW_SETTINGS", settings);
             //startActivity(intent);
             startActivityForResult(intent, 1);
+        } catch (FileNotFoundException fnfex) {
+            ///Create a default configuration file
+            VwSettings settings = new VwSettings();
+            settings.setUserName("mfpuseranme");
+            settings.setPassword("mfppw");
+            settings.setBmr(2000);
+
+            //The last official way-in, on subsequent days the weight is calculated based on caloroes
+            LocalDate startDate = org.joda.time.LocalDate.parse("2018-01-01", TodaysCalories.DATE_FORMATTER);
+            settings.setStartDate(startDate);
+            settings.setStartWeight(90.0);
+            settings.setTargetWeight(80.0);
+            //fm.writeFile(ctx, SETTINGS_FILE, settings.toString());
+            try{
+                fm.writeSettings(ctx, SETTINGS_FILE, settings);
+            } catch (Exception ex) {
+                TextView statusTextView = findViewById(R.id.statusTextView);
+                statusTextView.setText("Unable to create the default configuration file: " + ex);
+            }
+            TextView statusTextView = findViewById(R.id.statusTextView);
+            statusTextView.setText("Default configuration file created. Press Settings again.");
+
         } catch (Exception ex) {
             TextView statusTextView = findViewById(R.id.statusTextView);
             statusTextView.setText("Ex: " + ex);
