@@ -11,11 +11,11 @@ public class TodaysCalories {
     public static final String MFP_DATE_FORMAT = "yyyy-MM-dd";
 
 
+
     private LocalDate date = null;
     private int caloriesIn = 0;
     private int caloriesOut = 0;
 
-    //DateTimeFormatter formatter = DateTimeFormatter.ofPattern(null,null);
 
     public void setDate(LocalDate date) {
         this.date = date;

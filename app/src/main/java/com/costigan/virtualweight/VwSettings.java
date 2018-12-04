@@ -5,11 +5,14 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.io.Serializable;
+
 /**
  *
  * File Format: username,password,bmr,startDate,startWeight,targetWeight
  */
-public class VwSettings {
+public class VwSettings implements Serializable {
+    //Implements serializable so we  can pass this object in Intents
 
     String userName = "";
     String password = "";
@@ -48,7 +51,7 @@ public class VwSettings {
         return settings;
     }
 
-    private static void parseLine(VwSettings settings,String line) throws Exception{
+    public static void parseLine(VwSettings settings,String line) throws Exception{
         //Parse the string into this object
         String[] fields = line.split(",");
         if( fields.length != 6){
@@ -119,6 +122,14 @@ public class VwSettings {
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
+    public void setStartDateASYYYYMMMDD(String string) {
+        //String string = "2018-10-29";
+        LocalDate date = org.joda.time.LocalDate.parse(string, TodaysCalories.DATE_FORMATTER);
+        setStartDate(date);
+    }
+
+
+
 
     public double getStartWeight() {
         return startWeight;
@@ -127,6 +138,8 @@ public class VwSettings {
     public void setStartWeight(double startWeight) {
         this.startWeight = startWeight;
     }
+
+
 
 
     public String toWriteLine() {

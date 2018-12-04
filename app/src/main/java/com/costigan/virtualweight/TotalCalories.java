@@ -6,6 +6,13 @@ import java.util.Calendar;
 
 public class TotalCalories {
 
+    public static int SUCCESS = 0;
+    public static int FAILURE = -1;
+
+    private int status = SUCCESS;
+    //DateTimeFormatter formatter = DateTimeFormatter.ofPattern(null,null);
+
+
     int bmr = 0;
     //Historic calculation up to teh latest day at midnight before today
     private LocalDate latestDateMidnightBeforeToday = null;
@@ -132,10 +139,20 @@ public class TotalCalories {
         return oldWeight + getNetWeightChange(bmr);
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "TotalCalories{" +
-                "latestDateMidnightBeforeToday=" + latestDateMidnightBeforeToday +
+                "status=" + status +
+                ", bmr=" + bmr +
+                ", latestDateMidnightBeforeToday=" + latestDateMidnightBeforeToday +
                 ", numberOfDaysBeforeToday=" + numberOfDaysBeforeToday +
                 ", historticCaloriesIn=" + historticCaloriesIn +
                 ", historicCaloriesOut=" + historicCaloriesOut +

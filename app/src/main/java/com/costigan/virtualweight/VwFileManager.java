@@ -46,4 +46,21 @@ public class VwFileManager {
         return inputString;
     }
 
+
+    public VwSettings getSettingsFromFile(Context ctx, String fileName,VwSettings vws) throws Exception {
+
+        VwFileManager fm = new VwFileManager();
+
+        //Now read from this file
+        StringBuffer stringBuffer = new StringBuffer();
+        fm.readFile(ctx, VwFileManager.SETTINGS_FILE, stringBuffer);
+
+        vws.parseLine(vws,stringBuffer.toString().trim());
+
+        return vws;
+
+    }
+
+
+
 }
