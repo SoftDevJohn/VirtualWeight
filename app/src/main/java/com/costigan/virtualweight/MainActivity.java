@@ -147,15 +147,16 @@ public class MainActivity extends AppCompatActivity {
             owTv.setTextColor(Color.RED);
 
             String safeDateToTarget = now.plusDays((int) days).toString("dd/MMM/YYYY");
-            String fastDateToTarget = now.plusDays((int) fastingDays).toString("dd/MMM/YYYY");
-            String recommendationMsg = String.format("Safe weight loss for %.0f days (%s)\n or %.1f fasting days (%s).", days, safeDateToTarget, fastingDays, fastDateToTarget);
+            String fastDateToTarget = now.plusDays((int) fastingDays).toString("dd/MMM/YYYY HH:MM");
+            String recommendationMsg = String.format("To reach target, you need to:\n\t1) safely lose weight for %.0f days (%s); or\n\t\t2) fast for %.1fys until %s.", days, safeDateToTarget, fastingDays, fastDateToTarget);
 
             rTv.setText(recommendationMsg);
-            rTv.setTextColor(Color.MAGENTA);
+            rTv.setTextColor(Color.rgb(255,155,0));
 
         } else {
             owTv.setText("You have a buffer of: " + overWeightMsg);
             owTv.setTextColor(Color.GREEN);
+            rTv.setText("");
         }
 
     }
