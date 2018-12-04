@@ -27,16 +27,16 @@ public class MfpScreenScraper {
         return getCaloriesForDate(date);
     }
 
-    public TotalCalories getTotalCaloriesDateToToday(LocalDate fromDate) throws Exception {
+    public TotalCalories getTotalCaloriesDateToToday(String username, String password,LocalDate fromDate) throws Exception {
 
         LocalDate today = org.joda.time.LocalDate.now();
-        return getTotalCaloriesForDates(fromDate, today);
+        return getTotalCaloriesForDates(username,password,fromDate, today);
    }
 
 
-    public TotalCalories getTotalCaloriesForDates(LocalDate fromDate, LocalDate toDate) throws Exception {
+    public TotalCalories getTotalCaloriesForDates(String username, String password,LocalDate fromDate, LocalDate toDate) throws Exception {
         TotalCalories tc = new TotalCalories();
-        List<TodaysCalories> list = getCaloriesForDates(fromDate, toDate);
+        List<TodaysCalories> list = getCaloriesForDates(username,password,fromDate, toDate);
 
         tc.setNumberOfDaysBeforeToday(0);
         tc.setHistorticCaloriesIn(0);
@@ -52,25 +52,28 @@ public class MfpScreenScraper {
         }
 
         //Now get todays calories
-        TodaysCalories cal = list.get(list.size()-1);
-        tc.setToday(cal.getDate());
-        tc.setTodayCaloriesIn( cal.getCaloriesIn() );
-        tc.setTodayCaloriesOut( cal.getCaloriesOut() );
-
+        if(list.size() >= 1) {
+            TodaysCalories cal = list.get(list.size() - 1);
+            tc.setToday(cal.getDate());
+            tc.setTodayCaloriesIn(cal.getCaloriesIn());
+            tc.setTodayCaloriesOut(cal.getCaloriesOut());
+        }else{
+            tc.setStatus(TotalCalories.FAILURE);
+        }
         return tc;
     }
 
         /**
          * GOOD
          */
-    public List<TodaysCalories> getCaloriesForDates(LocalDate fromDate, LocalDate toDate) throws Exception {
+    public List<TodaysCalories> getCaloriesForDates(String username, String password,LocalDate fromDate, LocalDate toDate) throws Exception {
         List<TodaysCalories> list = new ArrayList<TodaysCalories>();
         String url = VwConstants.URL_LOGIN;
 
         Connection.Response res = Jsoup
                 .connect(url)
-                .data("username", VwConstants.USERNAME)
-                .data("password", VwConstants.PASSWORD)
+                .data("username", username)
+                .data("password", password)
                 .method(Connection.Method.POST)
                 .execute();
 
