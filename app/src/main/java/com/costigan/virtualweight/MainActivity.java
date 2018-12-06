@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
             String recommendationMsg = String.format("To reach target, you need to:\n\t1) safely lose weight for %.0f days (%s); or\n\t\t2) fast for %.1fys until %s.", days, safeDateToTarget, fastingDays, fastDateToTarget);
 
             rTv.setText(recommendationMsg);
-            rTv.setTextColor(Color.rgb(255,155,0));
+            rTv.setTextColor(Color.rgb(255, 155, 0));
 
         } else {
             owTv.setText("You have a buffer of: " + overWeightMsg);
@@ -162,9 +162,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * Called when the user taps the Weigh In button
-     */
+    //Testing threading
     public void calculateWeight(View view) {
         TextView statusTextView = findViewById(R.id.statusTextView);
 
@@ -173,17 +171,64 @@ public class MainActivity extends AppCompatActivity {
         WeightResultDto dto = vw.getWeight();
 
 
-        // Do something in response to button
-        /*
-        Intent intent = new Intent(this, DisplayMessageActivity.class);
-        //EditText editText = (EditText) findViewById(R.id.editText);
-        //String message = editText.getText().toString();
-        String weightResult = "81.3";
-        intent.putExtra(WEIGHT_RESULT, weightResult);
-        startActivity(intent);
-        */
+        final MfpScreenScraper mpfSc = new MfpScreenScraper();
+        try {
+
+            //final to allow the child chread to access it
+            final VwFileManager fm = new VwFileManager();
+
+            //Now read from this file
+            StringBuffer stringBuffer = new StringBuffer();
+            Context ctx = getApplicationContext();
+            fm.readFile(ctx, VwFileManager.SETTINGS_FILE, stringBuffer);
+            final VwSettings vws = new VwSettings(stringBuffer.toString().trim());
+
+            LocalDate dayAfterStartDate = vws.getDayAfterStartDate();
+
+            ///Run this in a seperate thread
+
+            // Otherwise, activity main thread will throw exception.
+            Thread okHttpExecuteThread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        final TotalCalories total = mpfSc.getTotalCaloriesDateToToday(vws.getUserName(), vws.getPassword(), vws.getDayAfterStartDate());
+
+                        //The child tread cannot update the UI  directly, otherwise we get:
+                        // Only the original thread that created a view hierarchy can touch its views.
+                        //So we need to use this method
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                sendChildThreadMessageToMainThread("", vws, total);
+                            }
+                        });
 
 
+                    } catch (final Exception ex) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                sendChildThreadMessageToMainThread("Ex=" + ex, null, null);
+                            }
+                        });
+
+                    }
+
+
+                }
+            };
+            statusTextView.setText("Retrieving calories, please wait...");
+            okHttpExecuteThread.start();
+
+        } catch (Exception ex) {
+            statusTextView.setText("Ex=" + ex);
+        }
+    }
+
+    // Send message from child thread to activity main thread.
+    // Because can not modify UI controls in child thread directly.
+    private void sendChildThreadMessageToMainThread(String rspMsg, final VwSettings vws, TotalCalories total) {
         TextView weightResultTextView = findViewById(R.id.weightResultTextView);
         TextView bmrTextView = findViewById(R.id.bmrTextView);
         TextView caloriesOutTextView = findViewById(R.id.caloriesOutTextView);
@@ -193,7 +238,45 @@ public class MainActivity extends AppCompatActivity {
         TextView owTv = findViewById(R.id.overWeightTextView);
         TextView rTv = findViewById(R.id.recomendationTextView);
 
-        //TextView statusTextView = findViewById(R.id.statusTextView);
+        TextView statusTextView = findViewById(R.id.statusTextView);
+        statusTextView.setText("Response: " + rspMsg + "TC=" + total);
+        if (total.getStatus() == TotalCalories.SUCCESS) {
+            double netWeight = total.getNetWeight(vws.getBmr(), vws.getStartWeight());
+            weightResultTextView.setText(String.valueOf(netWeight));
+            bmrTextView.setText(String.valueOf(total.getBmrSinceMidnight(vws.getBmr())));
+            caloriesInTextView.setText(String.valueOf(total.getTotalCaloriesIn()));
+            caloriesOutTextView.setText(String.valueOf(total.getTotalCaloriesOut()));
+            netCaloriesTextView.setText(String.valueOf(total.getNetCalories(vws.getBmr())));
+            netWeightTextView.setText(String.valueOf(total.getNetWeightChange(vws.getBmr())));
+            setOverweightMessage(owTv, rTv, netWeight, vws.getTargetWeight(), vws.getBmr());
+            statusTextView.setText("TC=" + total);
+
+
+        } else {
+            statusTextView.setText("Unable to retreive calories. Check internet connection and login credentials");
+        }
+
+    }
+
+
+    /**
+     * Called when the user taps the Weigh In button
+     */
+    public void calculateWeightWORKS(View view) {
+        TextView statusTextView = findViewById(R.id.statusTextView);
+
+        VirtualWeight vw = new VirtualWeight();
+        vw.calcuateWeight();
+        WeightResultDto dto = vw.getWeight();
+
+        TextView weightResultTextView = findViewById(R.id.weightResultTextView);
+        TextView bmrTextView = findViewById(R.id.bmrTextView);
+        TextView caloriesOutTextView = findViewById(R.id.caloriesOutTextView);
+        TextView caloriesInTextView = findViewById(R.id.caloriesInTextView);
+        TextView netCaloriesTextView = findViewById(R.id.netCaloriesTextView);
+        TextView netWeightTextView = findViewById(R.id.netWeightTextView);
+        TextView owTv = findViewById(R.id.overWeightTextView);
+        TextView rTv = findViewById(R.id.recomendationTextView);
 
         //Network operations should be running in a seperate thread
         //But this hack will allows us to develop and test it here
@@ -217,16 +300,11 @@ public class MainActivity extends AppCompatActivity {
                 double netWeight = total.getNetWeight(vws.getBmr(), vws.getStartWeight());
                 weightResultTextView.setText(String.valueOf(netWeight));
                 bmrTextView.setText(String.valueOf(total.getBmrSinceMidnight(vws.getBmr())));
-
-
                 caloriesInTextView.setText(String.valueOf(total.getTotalCaloriesIn()));
                 caloriesOutTextView.setText(String.valueOf(total.getTotalCaloriesOut()));
                 netCaloriesTextView.setText(String.valueOf(total.getNetCalories(vws.getBmr())));
                 netWeightTextView.setText(String.valueOf(total.getNetWeightChange(vws.getBmr())));
-
                 setOverweightMessage(owTv, rTv, netWeight, vws.getTargetWeight(), vws.getBmr());
-
-
                 statusTextView.setText("TC=" + total);
             } else {
                 statusTextView.setText("Unable to retreive calories. Check internet connection and login credentials");
