@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         double overweightPercentage = (overweight / targetWeight) * 100;
         double maxSafeWeightLoss = 750; //kcal = 0.7 kg / week = 1.7 lbs week
         double days = overweightCalories / maxSafeWeightLoss;
-        double fastingDays = overweightCalories / bmr;
+        double fastingHours = (overweightCalories / bmr) * 24 ;
 
 
         DateTime now = DateTime.now();
@@ -147,8 +147,8 @@ public class MainActivity extends AppCompatActivity {
             owTv.setTextColor(Color.RED);
 
             String safeDateToTarget = now.plusDays((int) days).toString("dd/MMM/YYYY");
-            String fastDateToTarget = now.plusDays((int) fastingDays).toString("dd/MMM/YYYY HH:MM");
-            String recommendationMsg = String.format("To reach target, you need to:\n\t1) safely lose weight for %.0f days (%s); or\n\t\t2) fast for %.1fys until %s.", days, safeDateToTarget, fastingDays, fastDateToTarget);
+            String fastDateToTarget = now.plusHours((int) fastingHours).toString("dd/MMM/YYYY HH:MM");
+            String recommendationMsg = String.format("To reach target, you need to:\n\t\t1) safely lose weight for %.0f days (%s); or\n\t\t2) fast for %.1f days until %s.", days, safeDateToTarget, (fastingHours/24), fastDateToTarget);
 
             rTv.setText(recommendationMsg);
             rTv.setTextColor(Color.rgb(255, 155, 0));
@@ -252,63 +252,6 @@ public class MainActivity extends AppCompatActivity {
             statusTextView.setText("TC=" + total);
      } else {
             statusTextView.setText("Unable to retreive calories. Check internet connection and login credentials");
-        }
-    }
-
-
-    /**
-     * Called when the user taps the Weigh In button
-     */
-    public void calculateWeightWORKS(View view) {
-        TextView statusTextView = findViewById(R.id.statusTextView);
-
-        VirtualWeight vw = new VirtualWeight();
-        vw.calcuateWeight();
-        WeightResultDto dto = vw.getWeight();
-
-        TextView weightResultTextView = findViewById(R.id.weightResultTextView);
-        TextView bmrTextView = findViewById(R.id.bmrTextView);
-        TextView caloriesOutTextView = findViewById(R.id.caloriesOutTextView);
-        TextView caloriesInTextView = findViewById(R.id.caloriesInTextView);
-        TextView netCaloriesTextView = findViewById(R.id.netCaloriesTextView);
-        TextView netWeightTextView = findViewById(R.id.netWeightTextView);
-        TextView owTv = findViewById(R.id.overWeightTextView);
-        TextView rTv = findViewById(R.id.recomendationTextView);
-
-        //Network operations should be running in a seperate thread
-        //But this hack will allows us to develop and test it here
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-        //End Hack
-        MfpScreenScraper mpfSc = new MfpScreenScraper();
-        try {
-            VwFileManager fm = new VwFileManager();
-
-            //Now read from this file
-            StringBuffer stringBuffer = new StringBuffer();
-            Context ctx = getApplicationContext();
-            fm.readFile(ctx, VwFileManager.SETTINGS_FILE, stringBuffer);
-            VwSettings vws = new VwSettings(stringBuffer.toString().trim());
-
-            LocalDate dayAfterStartDate = vws.getDayAfterStartDate();
-            TotalCalories total = mpfSc.getTotalCaloriesDateToToday(vws.getUserName(), vws.getPassword(), vws.getDayAfterStartDate());
-
-            if (total.getStatus() == TotalCalories.SUCCESS) {
-                double netWeight = total.getNetWeight(vws.getBmr(), vws.getStartWeight());
-                weightResultTextView.setText(String.valueOf(netWeight));
-                bmrTextView.setText(String.valueOf(total.getBmrSinceMidnight(vws.getBmr())));
-                caloriesInTextView.setText(String.valueOf(total.getTotalCaloriesIn()));
-                caloriesOutTextView.setText(String.valueOf(total.getTotalCaloriesOut()));
-                netCaloriesTextView.setText(String.valueOf(total.getNetCalories(vws.getBmr())));
-                netWeightTextView.setText(String.valueOf(total.getNetWeightChange(vws.getBmr())));
-                setOverweightMessage(owTv, rTv, netWeight, vws.getTargetWeight(), vws.getBmr());
-                statusTextView.setText("TC=" + total);
-            } else {
-                statusTextView.setText("Unable to retreive calories. Check internet connection and login credentials");
-            }
-
-        } catch (Exception ex) {
-            statusTextView.setText("Ex=" + ex);
         }
     }
 
