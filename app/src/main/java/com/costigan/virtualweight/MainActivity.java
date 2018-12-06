@@ -250,12 +250,9 @@ public class MainActivity extends AppCompatActivity {
             netWeightTextView.setText(String.valueOf(total.getNetWeightChange(vws.getBmr())));
             setOverweightMessage(owTv, rTv, netWeight, vws.getTargetWeight(), vws.getBmr());
             statusTextView.setText("TC=" + total);
-
-
-        } else {
+     } else {
             statusTextView.setText("Unable to retreive calories. Check internet connection and login credentials");
         }
-
     }
 
 
