@@ -58,7 +58,6 @@ public class MfpScreenScraper {
             tc.setTodayCaloriesIn(cal.getCaloriesIn());
             tc.setTodayCaloriesOut(cal.getCaloriesOut());
         }else{
-            tc.setStatus(TotalCalories.FAILURE);
         }
         return tc;
     }
