@@ -130,8 +130,8 @@ public class TotalCalories {
     public double getNetWeightChange(int bmr) {
         double netWeight = (double)getNetCalories(bmr) / (double)7700;
         //Round to two decomal places
-        int intWeight = (int)(netWeight * 100);
-        netWeight = (double)intWeight/(double)100;
+        int intWeight = (int)(netWeight * 1000);
+        netWeight = (double)intWeight/(double)1000;
         return netWeight;
     }
 

@@ -34,6 +34,12 @@ import static com.costigan.virtualweight.VwFileManager.SETTINGS_FILE;
 public class MainActivity extends AppCompatActivity {
     public static final String WEIGHT_RESULT = "com.costigan.virtualweight.WEIGHT_RESULT";
 
+
+    //https://www.livestrong.com/article/519568-does-slim-fast-curb-your-appetite/?ajax=1&is=1
+    //3 X 650 meals + 2 x 200 snacks
+    public static final int MAX_MEAL_CALORIES = 650;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,32 +129,47 @@ public class MainActivity extends AppCompatActivity {
     }//onActivityResult
 
     //getOverweightMessage(80.0,83.5,bmr
-    private void setOverweightMessage(TextView owTv, TextView rTv, double currentWeight, double targetWeight, double bmr) {
-        String fs;
+    private void setOverweightMessage(TextView owTv, TextView nmTv, TextView rTv, double currentWeight, double targetWeight, double bmr) {
 
         double overweight = currentWeight - targetWeight;
-
         double overweightCalories = overweight * 7700;
         double overweightPercentage = (overweight / targetWeight) * 100;
         double maxSafeWeightLoss = 750; //kcal = 0.7 kg / week = 1.7 lbs week
         double days = overweightCalories / maxSafeWeightLoss;
-        double fastingHours = (overweightCalories / bmr) * 24 ;
+        double fastingMinutes = (overweightCalories / bmr) * 60 * 24;
+
+        double minutesToNextMeal = ((overweightCalories + MAX_MEAL_CALORIES) / bmr) * 60 * 24;
 
 
         DateTime now = DateTime.now();
+        String nowStr = now.toString("EEE dd/MMM/YYYY HH:mm");
+
         DateTime dt = now.plusDays((int) days);
 
 
         String overWeightMsg = String.format("%.2f kg (%.0f kcal or %.0f %%)", Math.abs(overweight), Math.abs(overweightCalories), Math.abs(overweightPercentage));
 
 
+        if( minutesToNextMeal >0 ){
+            String nextMeal = now.plusMinutes((int) minutesToNextMeal).toString("EEE dd/MMM/YYYY HH:mm");
+            String nextMealMsg = String.format("(Within target mealtime: %s)", nextMeal);
+            nmTv.setText(nextMealMsg);
+            nmTv.setTextColor(Color.rgb(255, 155, 0));
+        }else{
+            nmTv.setText("(Can have next meal when ready)");
+            nmTv.setTextColor(Color.GREEN);
+        }
+
         if (overweight > 0) {
             owTv.setText("You are overweight by: " + overWeightMsg);
             owTv.setTextColor(Color.RED);
 
             String safeDateToTarget = now.plusDays((int) days).toString("dd/MMM/YYYY");
-            String fastDateToTarget = now.plusHours((int) fastingHours).toString("dd/MMM/YYYY HH:MM");
-            String recommendationMsg = String.format("To reach target, you need to:\n\t\t1) safely lose weight for %.0f days (%s); or\n\t\t2) fast for %.1f days until %s.", days, safeDateToTarget, (fastingHours/24), fastDateToTarget);
+            String fastDateToTarget = now.plusMinutes((int) fastingMinutes).toString("EEE dd/MMM/YYYY HH:mm");
+            String recommendationMsg = String.format("To reach target, you need to:" +
+                    "\n\t\t1) safely lose weight for %.0f days (%s); or" +
+                    "\n\t\t2) fast for %.1f days until %s.",
+                    days, safeDateToTarget, (fastingMinutes/60/24), fastDateToTarget);
 
             rTv.setText(recommendationMsg);
             rTv.setTextColor(Color.rgb(255, 155, 0));
@@ -236,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
         TextView netCaloriesTextView = findViewById(R.id.netCaloriesTextView);
         TextView netWeightTextView = findViewById(R.id.netWeightTextView);
         TextView owTv = findViewById(R.id.overWeightTextView);
+        TextView nmTv = findViewById(R.id.nextMealTextView);
         TextView rTv = findViewById(R.id.recomendationTextView);
 
         TextView statusTextView = findViewById(R.id.statusTextView);
@@ -248,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
             caloriesOutTextView.setText(String.valueOf(total.getTotalCaloriesOut()));
             netCaloriesTextView.setText(String.valueOf(total.getNetCalories(vws.getBmr())));
             netWeightTextView.setText(String.valueOf(total.getNetWeightChange(vws.getBmr())));
-            setOverweightMessage(owTv, rTv, netWeight, vws.getTargetWeight(), vws.getBmr());
+            setOverweightMessage(owTv, nmTv,rTv, netWeight, vws.getTargetWeight(), vws.getBmr());
             statusTextView.setText("TC=" + total);
      } else {
             statusTextView.setText("Unable to retreive calories. Check internet connection and login credentials");
