@@ -83,6 +83,7 @@ public class MfpScreenScraper {
         // now iterate over each date
         for (LocalDate searchDate = fromDate; (searchDate.isBefore(toDate) || searchDate.isEqual(toDate)); searchDate = searchDate.plusDays(1)) {
             TodaysCalories todaysCalories = new TodaysCalories();
+            list.add(todaysCalories);
 
             Document doc2 = Jsoup
                     .connect(getUrl(searchDate))
@@ -139,7 +140,6 @@ public class MfpScreenScraper {
                 todaysCalories.setCaloriesOut(0);
             }
 
-            list.add(todaysCalories);
         }
 
         return list;
