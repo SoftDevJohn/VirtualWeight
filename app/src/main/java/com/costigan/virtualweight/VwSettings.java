@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class VwSettings implements Serializable {
     //Implements serializable so we  can pass this object in Intents
 
-    String userName = "";
+    private String userName = "";
     String password = "";
     int bmr = 0;
     LocalDate startDate;
@@ -31,7 +31,7 @@ public class VwSettings implements Serializable {
         parseLine(this,line);
     }
 
-    public VwSettings(String userName, String passwoed,int bmr,LocalDate startDate,double startWeight,double targetWeight) throws Exception{
+    public VwSettings(String userName, String passwoed,int bmr,LocalDate startDate,double startWeight,double targetWeight) {
         this.userName = userName;
         this.password = userName;
         this.bmr = bmr;

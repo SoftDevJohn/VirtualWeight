@@ -2,16 +2,8 @@ package com.costigan.virtualweight;
 
 import org.joda.time.LocalDate;
 
-import java.util.List;
-
-public class CalorieCalculator {
-    private List<TodaysCalories> calories;
-    private LocalDate today;
-
-    public CalorieCalculator(List<TodaysCalories> calories, LocalDate today){
-        this.calories = calories;
-        this.today = today;
-    }
+class CalorieCalculator {
+    //private LocalDate today;
 
 
     //public getTotalCaloriesBeforeToday(List<TodaysCalories> calories){

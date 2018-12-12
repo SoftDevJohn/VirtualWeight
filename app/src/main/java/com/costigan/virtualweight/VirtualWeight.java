@@ -1,10 +1,10 @@
 package com.costigan.virtualweight;
 
-public class VirtualWeight {
-    WeightResultDto dto = new WeightResultDto();
-    private double weight = -1;
+class VirtualWeight {
+    final WeightResultDto dto = new WeightResultDto();
+
     public void calcuateWeight(){
-        weight = 83.2;
+        double weight = 83.2;
         //TODO Calculate these values
         dto.setYesterdaysWeight(80.5);
         dto.setBmr(2065);

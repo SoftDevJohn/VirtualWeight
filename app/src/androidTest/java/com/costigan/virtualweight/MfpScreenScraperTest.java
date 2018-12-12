@@ -3,11 +3,8 @@ package com.costigan.virtualweight;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.junit.Test;
-
-import java.util.List;
 
 import static org.junit.Assert.*;
 

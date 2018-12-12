@@ -118,7 +118,7 @@ public class WeightResultDto {
 
 
 
-    public static long getSecondsSinceMidnight() {
+    private static long getSecondsSinceMidnight() {
         Calendar now = Calendar.getInstance();
         Calendar midnight = Calendar.getInstance();
 

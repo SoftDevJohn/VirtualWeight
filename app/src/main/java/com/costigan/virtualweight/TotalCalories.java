@@ -6,14 +6,14 @@ import java.util.Calendar;
 
 public class TotalCalories {
 
-    public static int SUCCESS = 0;
+    public static final int SUCCESS = 0;
     public static int FAILURE = -1;
 
     private int status = SUCCESS;
     //DateTimeFormatter formatter = DateTimeFormatter.ofPattern(null,null);
 
 
-    int bmr = 0;
+    private int bmr = 0;
     //Historic calculation up to teh latest day at midnight before today
     private LocalDate latestDateMidnightBeforeToday = null;
     private int numberOfDaysBeforeToday = 0;

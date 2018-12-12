@@ -41,7 +41,7 @@ public class TodaysCalories {
         return caloriesIn;
     }
 
-    public int getNetCalories() {
+    private int getNetCalories() {
         return caloriesIn-caloriesOut;
     }
 

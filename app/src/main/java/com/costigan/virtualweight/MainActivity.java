@@ -3,32 +3,17 @@ package com.costigan.virtualweight;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.content.Context;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.util.List;
-import java.util.Map;
 
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
 import static com.costigan.virtualweight.VwFileManager.SETTINGS_FILE;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     //https://www.livestrong.com/article/519568-does-slim-fast-curb-your-appetite/?ajax=1&is=1
     //3 X 650 meals + 2 x 200 snacks
-    public static final int MAX_MEAL_CALORIES = 650;
+    private static final int MAX_MEAL_CALORIES = 650;
 
 
     @Override
@@ -192,7 +177,9 @@ public class MainActivity extends AppCompatActivity {
         WeightResultDto dto = vw.getWeight();
 
 
-        final MfpScreenScraper mpfSc = new MfpScreenScraper();
+        final ScreenScraper ss = new MfpScreenScraper();
+
+
         try {
 
             //final to allow the child chread to access it
@@ -213,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     try {
-                        final TotalCalories total = mpfSc.getTotalCaloriesDateToToday(vws.getUserName(), vws.getPassword(), vws.getDayAfterStartDate());
+                        final TotalCalories total = ss.getTotalCaloriesDateToToday(vws.getUserName(), vws.getPassword(), vws.getDayAfterStartDate());
 
                         //The child tread cannot update the UI  directly, otherwise we get:
                         // Only the original thread that created a view hierarchy can touch its views.

@@ -33,7 +33,7 @@ public class VwFileManager {
         fos.close();
     }
 
-    public String readFile(Context ctx, String fileName, StringBuffer stringBuffer) throws Exception {
+    public void readFile(Context ctx, String fileName, StringBuffer stringBuffer) throws Exception {
 
         //Now read from this file
         BufferedReader inputReader = new BufferedReader(
@@ -41,13 +41,12 @@ public class VwFileManager {
                         ctx.openFileInput(fileName)));
         String inputString;
         while ((inputString = inputReader.readLine()) != null) {
-            stringBuffer.append(inputString + "\n");
+            stringBuffer.append(inputString).append("\n");
         }
-        return inputString;
     }
 
 
-    public VwSettings getSettingsFromFile(Context ctx, String fileName,VwSettings vws) throws Exception {
+    public void getSettingsFromFile(Context ctx, String fileName, VwSettings vws) throws Exception {
 
         VwFileManager fm = new VwFileManager();
 
@@ -55,9 +54,7 @@ public class VwFileManager {
         StringBuffer stringBuffer = new StringBuffer();
         fm.readFile(ctx, VwFileManager.SETTINGS_FILE, stringBuffer);
 
-        vws.parseLine(vws,stringBuffer.toString().trim());
-
-        return vws;
+        VwSettings.parseLine(vws,stringBuffer.toString().trim());
 
     }
 

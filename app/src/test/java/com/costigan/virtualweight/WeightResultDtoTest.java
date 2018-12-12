@@ -10,7 +10,7 @@ public class WeightResultDtoTest {
 
     WeightResultDto dto = new WeightResultDto();
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
 
         dto.setYesterdaysWeight(80.5);
@@ -20,7 +20,7 @@ public class WeightResultDtoTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
     }
 
     @Test
