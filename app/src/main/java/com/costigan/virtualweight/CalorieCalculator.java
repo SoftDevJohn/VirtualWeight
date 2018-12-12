@@ -6,7 +6,7 @@ class CalorieCalculator {
     //private LocalDate today;
 
 
-    //public getTotalCaloriesBeforeToday(List<TodaysCalories> calories){
+    //public getTotalCaloriesBeforeToday(List<Calorie> calories){
     //    this.calories = calories;
     //}
 
@@ -25,15 +25,15 @@ class CalorieCalculator {
         LocalDate dayAfterStartDate = vws.getDayAfterStartDate();
 
         String startDateStr = "2018-10-26";
-        LocalDate startDate = org.joda.time.LocalDate.parse(startDateStr, TodaysCalories.DATE_FORMATTER);
+        LocalDate startDate = org.joda.time.LocalDate.parse(startDateStr, Calorie.DATE_FORMATTER);
         String endDateStr = "2018-10-29";
-        LocalDate endDate = org.joda.time.LocalDate.parse(endDateStr, TodaysCalories.DATE_FORMATTER);
+        LocalDate endDate = org.joda.time.LocalDate.parse(endDateStr, Calorie.DATE_FORMATTER);
 
 
         MfpScreenScraper mpfSc = new MfpScreenScraper();
 
 
-        List<TodaysCalories> list = mpfSc.getCaloriesForDates(startDate,endDate);
+        List<Calorie> list = mpfSc.getCaloriesForDates(startDate,endDate);
         //todo:
         //1) Get calories between the given dates inclusive
         //2) Scan list for latest date before today and save that back into the configuraion fule

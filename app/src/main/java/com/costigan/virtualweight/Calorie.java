@@ -6,7 +6,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class TodaysCalories {
+public class Calorie {
     public final static DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
     public static final String MFP_DATE_FORMAT = "yyyy-MM-dd";
 
@@ -63,7 +63,7 @@ public class TodaysCalories {
 
     @Override
     public String toString() {
-        return "TodaysCalories{" +
+        return "Calorie{" +
                 "date=" + date +
                 ", caloriesIn=" + caloriesIn +
                 ", caloriesOut=" + caloriesOut +

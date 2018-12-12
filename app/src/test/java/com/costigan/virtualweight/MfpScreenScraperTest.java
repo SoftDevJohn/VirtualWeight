@@ -24,16 +24,16 @@ public class MfpScreenScraperTest {
     //@Test
     public void getTodaysCalories() throws Exception{
         MfpScreenScraper mpfSc = new MfpScreenScraper();
-        TodaysCalories tc = mpfSc.getCaloriesForToday();
+        Calorie tc = mpfSc.getCaloriesForToday();
         assertEquals("2018-11-28", tc.getDateAsMfpString());
     }
 
     @Test
     public void getCaloriesForDate() throws Exception{
         String octDate = "2018-10-29";
-        LocalDate date = org.joda.time.LocalDate.parse(octDate, TodaysCalories.DATE_FORMATTER);
+        LocalDate date = org.joda.time.LocalDate.parse(octDate, Calorie.DATE_FORMATTER);
         MfpScreenScraper mpfSc = new MfpScreenScraper();
-        TodaysCalories tc = mpfSc.getCaloriesForDate(date);
+        Calorie tc = mpfSc.getCaloriesForDate(date);
         assertEquals(octDate, tc.getDateAsMfpString());
         assertEquals(1534, tc.getCaloriesIn());
         //assertEquals(702, tc.getCaloriesOut());

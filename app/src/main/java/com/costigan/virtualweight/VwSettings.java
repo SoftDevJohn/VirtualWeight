@@ -124,7 +124,7 @@ public class VwSettings implements Serializable {
     }
     public void setStartDateASYYYYMMMDD(String string) {
         //String string = "2018-10-29";
-        LocalDate date = org.joda.time.LocalDate.parse(string, TodaysCalories.DATE_FORMATTER);
+        LocalDate date = org.joda.time.LocalDate.parse(string, Calorie.DATE_FORMATTER);
         setStartDate(date);
     }
 

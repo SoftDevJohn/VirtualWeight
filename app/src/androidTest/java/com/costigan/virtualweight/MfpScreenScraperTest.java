@@ -30,7 +30,7 @@ public class MfpScreenScraperTest {
         LocalDate dayAfterStartDate = vws.getDayAfterStartDate();
 
         String endDateStr = "2018-11-30";
-        LocalDate endDate = org.joda.time.LocalDate.parse(endDateStr, TodaysCalories.DATE_FORMATTER);
+        LocalDate endDate = org.joda.time.LocalDate.parse(endDateStr, Calorie.DATE_FORMATTER);
         MfpScreenScraper mpfSc = new MfpScreenScraper();
 
         TotalCalories total = mpfSc.getTotalCaloriesDateToToday(vws.getDayAfterStartDate());

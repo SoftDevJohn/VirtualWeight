@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             settings.setBmr(2000);
 
             //The last official way-in, on subsequent days the weight is calculated based on caloroes
-            LocalDate startDate = org.joda.time.LocalDate.parse("2018-01-01", TodaysCalories.DATE_FORMATTER);
+            LocalDate startDate = org.joda.time.LocalDate.parse("2018-01-01", Calorie.DATE_FORMATTER);
             settings.setStartDate(startDate);
             settings.setStartWeight(90.0);
             settings.setTargetWeight(80.0);
