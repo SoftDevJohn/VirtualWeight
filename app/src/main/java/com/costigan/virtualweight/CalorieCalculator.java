@@ -2,51 +2,82 @@ package com.costigan.virtualweight;
 
 import org.joda.time.LocalDate;
 
+import java.util.Calendar;
+
 class CalorieCalculator {
-    //private LocalDate today;
+    private VwSettings settings = null;
+    private TotalCalories total = null;
+
+    public VwSettings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(VwSettings settings) {
+        this.settings = settings;
+    }
+
+    public TotalCalories getTotal() {
+        return total;
+    }
+
+    public void setTotal(TotalCalories total) {
+        this.total = total;
+    }
+
+    public int getNetCalories() {
+        return total.getTotalCaloriesIn() - total.getTotalCaloriesOut() - getTotalBmr();
+    }
+
+    public int getTotalBmr() {
+        int bmr = getSettings().getBmr();
+        return getTotalBmrToYesterday() + getBmrSinceMidnight();
+    }
+
+    public int getTotalBmrToYesterday(){
+        int bmr = getSettings().getBmr();
+        return bmr * total.getNumberOfDaysBeforeToday();
+    }
+
+    public int getBmrSinceMidnight() {
+        int bmr = getSettings().getBmr();
+        return (int)((double)bmr * getFractionOfDay());
+    }
+
+    private static double getFractionOfDay() {
+        double d = getSecondsSinceMidnight() / (double)86400000;
+        return getRoundedValue(d,3);
+    }
+
+    public static double getRoundedValue(double d, int places) {
+        double scale = Math.pow(10, places);
+        return Math.round(d * scale) / scale;
+    }
+
+    private static long getSecondsSinceMidnight() {
+        Calendar now = Calendar.getInstance();
+        Calendar midnight = Calendar.getInstance();
+
+        midnight.set(Calendar.HOUR_OF_DAY, 0);
+        midnight.set(Calendar.MINUTE, 0);
+        midnight.set(Calendar.SECOND, 0);
+        midnight.set(Calendar.MILLISECOND, 0);
+
+        return now.getTimeInMillis() - midnight.getTimeInMillis();
+    }
+
+    public double getNetWeightChange() {
+        //int bmr = getSettings().getBmr();
+        double netWeight = (double)getNetCalories() / (double)7700;
+        //Round to two decomal places
+        int intWeight = (int)(netWeight * 1000);
+        netWeight = (double)intWeight/(double)1000;
+        return netWeight;
+    }
+
+    public double getNetWeight() {
+        return getSettings().getStartWeight() + getNetWeightChange();
+    }
 
 
-    //public getTotalCaloriesBeforeToday(List<Calorie> calories){
-    //    this.calories = calories;
-    //}
 
-
-
-    /*
-           Context ctx = InstrumentationRegistry.getTargetContext();
-        VwFileManager fm = new VwFileManager();
-
-        //Now read from this file
-        StringBuffer stringBuffer = new StringBuffer();
-        fm.readFile(ctx, VwFileManager.SETTINGS_FILE, stringBuffer);
-        VwSettings vws = new VwSettings(stringBuffer.toString().trim());
-
-        //returns the 26-oct
-        LocalDate dayAfterStartDate = vws.getDayAfterStartDate();
-
-        String startDateStr = "2018-10-26";
-        LocalDate startDate = org.joda.time.LocalDate.parse(startDateStr, Calorie.DATE_FORMATTER);
-        String endDateStr = "2018-10-29";
-        LocalDate endDate = org.joda.time.LocalDate.parse(endDateStr, Calorie.DATE_FORMATTER);
-
-
-        MfpScreenScraper mpfSc = new MfpScreenScraper();
-
-
-        List<Calorie> list = mpfSc.getCaloriesForDates(startDate,endDate);
-        //todo:
-        //1) Get calories between the given dates inclusive
-        //2) Scan list for latest date before today and save that back into the configuraion fule
-
-
-        //TODO
-        //Sum the calories
-        //Get Yesterdays date
-        //cc = CalorieCalculator(list);
-        //cc.sumCaloriesToYesterdayMidnight();
-        //cc.caloriesForToday()
-        //cc.calloriesUpToToday();
-
-
-     */
 }

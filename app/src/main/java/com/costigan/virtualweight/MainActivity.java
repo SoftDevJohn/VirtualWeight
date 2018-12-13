@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    CalorieCalculator calculator = new CalorieCalculator();
     //Testing threading
     public void calculateWeight(View view) {
         TextView statusTextView = findViewById(R.id.statusTextView);
@@ -189,9 +190,9 @@ public class MainActivity extends AppCompatActivity {
             StringBuffer stringBuffer = new StringBuffer();
             Context ctx = getApplicationContext();
             fm.readFile(ctx, VwFileManager.SETTINGS_FILE, stringBuffer);
-            final VwSettings vws = new VwSettings(stringBuffer.toString().trim());
-
-            LocalDate dayAfterStartDate = vws.getDayAfterStartDate();
+            final VwSettings settings = new VwSettings(stringBuffer.toString().trim());
+            calculator.setSettings(settings);
+            LocalDate dayAfterStartDate = settings.getDayAfterStartDate();
 
             ///Run this in a seperate thread
 
@@ -200,7 +201,8 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     try {
-                        final TotalCalories total = ss.getTotalCaloriesDateToToday(vws.getUserName(), vws.getPassword(), vws.getDayAfterStartDate());
+                        final TotalCalories total = ss.getTotalCaloriesDateToToday(calculator.getSettings().getUserName(), calculator.getSettings().getPassword(), calculator.getSettings().getDayAfterStartDate());
+//                        final TotalCalories total = ss.getTotalCaloriesDateToToday(settings.getUserName(), settings.getPassword(), settings.getDayAfterStartDate());
 
                         //The child tread cannot update the UI  directly, otherwise we get:
                         // Only the original thread that created a view hierarchy can touch its views.
@@ -208,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                sendChildThreadMessageToMainThread("", vws, total);
+                                sendChildThreadMessageToMainThread("", settings, total);
                             }
                         });
 
@@ -236,7 +238,11 @@ public class MainActivity extends AppCompatActivity {
 
     // Send message from child thread to activity main thread.
     // Because can not modify UI controls in child thread directly.
-    private void sendChildThreadMessageToMainThread(String rspMsg, final VwSettings vws, TotalCalories total) {
+    private void sendChildThreadMessageToMainThread(String rspMsg, final VwSettings XXXvws, TotalCalories total) {
+        final VwSettings vws = calculator.getSettings();
+        calculator.setTotal(total);
+
+
         TextView weightResultTextView = findViewById(R.id.weightResultTextView);
         TextView bmrTextView = findViewById(R.id.bmrTextView);
         TextView caloriesOutTextView = findViewById(R.id.caloriesOutTextView);
@@ -248,15 +254,16 @@ public class MainActivity extends AppCompatActivity {
         TextView rTv = findViewById(R.id.recomendationTextView);
 
         TextView statusTextView = findViewById(R.id.statusTextView);
+
         statusTextView.setText("Response: " + rspMsg + "TC=" + total);
         if (total.getStatus() == TotalCalories.SUCCESS) {
-            double netWeight = total.getNetWeight(vws.getBmr(), vws.getStartWeight());
+            double netWeight = calculator.getNetWeight();
             weightResultTextView.setText(String.valueOf(netWeight));
-            bmrTextView.setText(String.valueOf(total.getBmrSinceMidnight(vws.getBmr())));
+            bmrTextView.setText(String.valueOf(calculator.getBmrSinceMidnight()));
             caloriesInTextView.setText(String.valueOf(total.getTotalCaloriesIn()));
             caloriesOutTextView.setText(String.valueOf(total.getTotalCaloriesOut()));
-            netCaloriesTextView.setText(String.valueOf(total.getNetCalories(vws.getBmr())));
-            netWeightTextView.setText(String.valueOf(total.getNetWeightChange(vws.getBmr())));
+            netCaloriesTextView.setText(String.valueOf(calculator.getNetCalories()));
+            netWeightTextView.setText(String.valueOf(calculator.getNetWeightChange()));
             setOverweightMessage(owTv, nmTv,rTv, netWeight, vws.getTargetWeight(), vws.getBmr());
             statusTextView.setText("TC=" + total);
      } else {

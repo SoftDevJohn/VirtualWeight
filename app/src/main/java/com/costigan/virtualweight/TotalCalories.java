@@ -81,6 +81,7 @@ public class TotalCalories {
         this.todayCaloriesOut = todayCaloriesOut;
     }
 
+    //Factor
     public int getTotalBmrToYesterday(int bmr){
         return bmr * getNumberOfDaysBeforeToday();
     }
@@ -89,16 +90,20 @@ public class TotalCalories {
         return (int)((double)bmr * getFractionOfDay());
     }
 
+    //Factor
     private static double getFractionOfDay() {
         double d = getSecondsSinceMidnight() / (double)86400000;
         return getRoundedValue(d,3);
     }
+
+    //Factor
     public static double getRoundedValue(double d, int places) {
         double scale = Math.pow(10, places);
         return Math.round(d * scale) / scale;
     }
 
 
+    //Factor
     private static long getSecondsSinceMidnight() {
         Calendar now = Calendar.getInstance();
         Calendar midnight = Calendar.getInstance();
@@ -117,26 +122,6 @@ public class TotalCalories {
 
     public int getTotalCaloriesOut() {
         return getHistoricCaloriesOut()+getTodayCaloriesOut();
-    }
-
-    public int getTotalBmr(int bmr) {
-        return getTotalBmrToYesterday(bmr) + getBmrSinceMidnight(bmr);
-    }
-
-    public int getNetCalories(int bmr) {
-        return getTotalCaloriesIn() - getTotalCaloriesOut() - getTotalBmr(bmr);
-    }
-
-    public double getNetWeightChange(int bmr) {
-        double netWeight = (double)getNetCalories(bmr) / (double)7700;
-        //Round to two decomal places
-        int intWeight = (int)(netWeight * 1000);
-        netWeight = (double)intWeight/(double)1000;
-        return netWeight;
-    }
-
-    public double getNetWeight(int bmr, double oldWeight) {
-        return oldWeight + getNetWeightChange(bmr);
     }
 
     public int getStatus() {

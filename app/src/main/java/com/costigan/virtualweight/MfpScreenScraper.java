@@ -87,7 +87,7 @@ public class MfpScreenScraper implements ScreenScraper {
             list.add(calorie);
 
             Document doc2 = Jsoup
-                    .connect(getUrl(searchDate))
+                    .connect(getUrl(username,searchDate))
                     .cookies(cookies)
                     .get();
 
@@ -147,11 +147,11 @@ public class MfpScreenScraper implements ScreenScraper {
     }
 
     @NonNull
-    private String getUrl(LocalDate searchDate) {
+    private String getUrl(String username,LocalDate searchDate) {
 
         String mfpDate = searchDate.toString(MFP_DATE_FORMAT);
 //        return VwConstants.URL_QUERY+VwConstants.USERNAME+"?from=2018-10-29&to=2018-10-29";
-        return VwConstants.URL_QUERY + VwConstants.USERNAME + "?from=" + mfpDate + "&to=" + mfpDate;
+        return VwConstants.URL_QUERY + username + "?from=" + mfpDate + "&to=" + mfpDate;
     }
 
     private LocalDate getDateFromAmericanDateString(String americanDate) {
