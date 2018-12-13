@@ -19,23 +19,44 @@ import static com.costigan.virtualweight.VwFileManager.SETTINGS_FILE;
 public class MainActivity extends AppCompatActivity {
     public static final String WEIGHT_RESULT = "com.costigan.virtualweight.WEIGHT_RESULT";
 
+    CalorieCalculator calculator = new CalorieCalculator();
+    TextView statusTextView = null;
 
     //https://www.livestrong.com/article/519568-does-slim-fast-curb-your-appetite/?ajax=1&is=1
     //3 X 650 meals + 2 x 200 snacks
     private static final int MAX_MEAL_CALORIES = 650;
+    TextView weightResultTextView = null;
+    TextView bmrTextView = null;
+    TextView caloriesOutTextView = null;
+    TextView caloriesInTextView = null;
+    TextView netCaloriesTextView = null;
+    TextView netWeightTextView = null;
+    TextView owTv = null;
+    TextView nmTv = null;
+    TextView rTv = null;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        statusTextView = findViewById(R.id.statusTextView);
+        weightResultTextView = findViewById(R.id.weightResultTextView);
+        bmrTextView = findViewById(R.id.bmrTextView);
+        caloriesOutTextView = findViewById(R.id.caloriesOutTextView);
+        caloriesInTextView = findViewById(R.id.caloriesInTextView);
+        netCaloriesTextView = findViewById(R.id.netCaloriesTextView);
+        netWeightTextView = findViewById(R.id.netWeightTextView);
+        owTv = findViewById(R.id.overWeightTextView);
+        nmTv = findViewById(R.id.nextMealTextView);
+        rTv = findViewById(R.id.recomendationTextView);
     }
 
     /**
      * Called when the user taps the Weigh In button
      */
-
-
     public void changeSettings(View view) {
 
         //Open the Settings Screem
@@ -45,13 +66,8 @@ public class MainActivity extends AppCompatActivity {
         Context ctx = getApplicationContext();
         VwFileManager fm = new VwFileManager();
         try {
-            //String MY_FILE_NAME = "mytextfile.txt";
-
-
             VwSettings settings = new VwSettings();
-            //settings.setUserName("MyUsrName");
             fm.getSettingsFromFile(ctx, SETTINGS_FILE, settings);
-
             String message = "My message";
             intent.putExtra("VW_SETTINGS", settings);
             //startActivity(intent);
@@ -72,30 +88,25 @@ public class MainActivity extends AppCompatActivity {
             try {
                 fm.writeSettings(ctx, SETTINGS_FILE, settings);
             } catch (Exception ex) {
-                TextView statusTextView = findViewById(R.id.statusTextView);
                 statusTextView.setText("Unable to create the default configuration file: " + ex);
             }
-            TextView statusTextView = findViewById(R.id.statusTextView);
             statusTextView.setText("Default configuration file created. Press Settings again.");
 
         } catch (Exception ex) {
-            TextView statusTextView = findViewById(R.id.statusTextView);
             statusTextView.setText("Ex: " + ex);
 
         }
-
-
     }
 
     //Handle the results from the Update settings dialog
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        TextView statusTextView = findViewById(R.id.statusTextView);
 
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
                 //String result=intent.getStringExtra("result");
                 VwSettings settings = (VwSettings) intent.getSerializableExtra("VW_SETTINGS_RETURNED");
+                calculator.setSettings(settings);
                 statusTextView.setText("Settings are:" + settings.toString());
                 Context ctx = getApplicationContext();
                 VwFileManager fm = new VwFileManager();
@@ -104,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception ex) {
                     statusTextView.setText("Ex: " + ex);
                 }
-
+                refreshMainDisplay();
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
@@ -116,45 +127,41 @@ public class MainActivity extends AppCompatActivity {
     //getOverweightMessage(80.0,83.5,bmr
     private void setOverweightMessage(TextView owTv, TextView nmTv, TextView rTv, double currentWeight, double targetWeight, double bmr) {
 
+        CalorieCalculator.RecommendationStats stats = calculator.getRecommendationStats();
+        /*
         double overweight = currentWeight - targetWeight;
         double overweightCalories = overweight * 7700;
         double overweightPercentage = (overweight / targetWeight) * 100;
         double maxSafeWeightLoss = 750; //kcal = 0.7 kg / week = 1.7 lbs week
+
         double days = overweightCalories / maxSafeWeightLoss;
         double fastingMinutes = (overweightCalories / bmr) * 60 * 24;
-
         double minutesToNextMeal = ((overweightCalories + MAX_MEAL_CALORIES) / bmr) * 60 * 24;
-
-
         DateTime now = DateTime.now();
-        String nowStr = now.toString("EEE dd/MMM/YYYY HH:mm");
+        */
 
-        DateTime dt = now.plusDays((int) days);
+        String overWeightMsg = String.format("%.2f kg (%.0f kcal or %.0f %%)", Math.abs(stats.overweight), Math.abs(stats.overweightCalories), Math.abs(stats.overweightPercentage));
 
-
-        String overWeightMsg = String.format("%.2f kg (%.0f kcal or %.0f %%)", Math.abs(overweight), Math.abs(overweightCalories), Math.abs(overweightPercentage));
-
-
-        if( minutesToNextMeal >0 ){
-            String nextMeal = now.plusMinutes((int) minutesToNextMeal).toString("EEE dd/MMM/YYYY HH:mm");
+        if (stats.minutesToNextMeal > 0) {
+            String nextMeal = stats.now.plusMinutes((int) stats.minutesToNextMeal).toString("EEE dd/MMM/YYYY HH:mm");
             String nextMealMsg = String.format("(Within target mealtime: %s)", nextMeal);
             nmTv.setText(nextMealMsg);
             nmTv.setTextColor(Color.rgb(255, 155, 0));
-        }else{
+        } else {
             nmTv.setText("(Can have next meal when ready)");
             nmTv.setTextColor(Color.GREEN);
         }
 
-        if (overweight > 0) {
+        if (stats.overweight > 0) {
             owTv.setText("You are overweight by: " + overWeightMsg);
             owTv.setTextColor(Color.RED);
 
-            String safeDateToTarget = now.plusDays((int) days).toString("dd/MMM/YYYY");
-            String fastDateToTarget = now.plusMinutes((int) fastingMinutes).toString("EEE dd/MMM/YYYY HH:mm");
+            String safeDateToTarget = stats.now.plusDays((int) stats.days).toString("dd/MMM/YYYY");
+            String fastDateToTarget = stats.now.plusMinutes((int) stats.fastingMinutes).toString("EEE dd/MMM/YYYY HH:mm");
             String recommendationMsg = String.format("To reach target, you need to:" +
-                    "\n\t\t1) safely lose weight for %.0f days (%s); or" +
-                    "\n\t\t2) fast for %.1f days until %s.",
-                    days, safeDateToTarget, (fastingMinutes/60/24), fastDateToTarget);
+                            "\n\t\t1) safely lose weight for %.0f days (%s); or" +
+                            "\n\t\t2) fast for %.1f days until %s.",
+                    stats.days, safeDateToTarget, (stats.fastingMinutes / 60 / 24), fastDateToTarget);
 
             rTv.setText(recommendationMsg);
             rTv.setTextColor(Color.rgb(255, 155, 0));
@@ -168,21 +175,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    CalorieCalculator calculator = new CalorieCalculator();
     //Testing threading
     public void calculateWeight(View view) {
-        TextView statusTextView = findViewById(R.id.statusTextView);
 
         VirtualWeight vw = new VirtualWeight();
         vw.calcuateWeight();
         WeightResultDto dto = vw.getWeight();
-
-
         final ScreenScraper ss = new MfpScreenScraper();
 
-
         try {
-
             //final to allow the child chread to access it
             final VwFileManager fm = new VwFileManager();
 
@@ -195,14 +196,12 @@ public class MainActivity extends AppCompatActivity {
             LocalDate dayAfterStartDate = settings.getDayAfterStartDate();
 
             ///Run this in a seperate thread
-
             // Otherwise, activity main thread will throw exception.
             Thread okHttpExecuteThread = new Thread() {
                 @Override
                 public void run() {
                     try {
                         final TotalCalories total = ss.getTotalCaloriesDateToToday(calculator.getSettings().getUserName(), calculator.getSettings().getPassword(), calculator.getSettings().getDayAfterStartDate());
-//                        final TotalCalories total = ss.getTotalCaloriesDateToToday(settings.getUserName(), settings.getPassword(), settings.getDayAfterStartDate());
 
                         //The child tread cannot update the UI  directly, otherwise we get:
                         // Only the original thread that created a view hierarchy can touch its views.
@@ -210,22 +209,18 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                sendChildThreadMessageToMainThread("", settings, total);
+                                sendChildThreadMessageToMainThread("", total);
                             }
                         });
-
 
                     } catch (final Exception ex) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                sendChildThreadMessageToMainThread("Ex=" + ex, null, null);
+                                sendChildThreadMessageToMainThread("Ex=" + ex, null);
                             }
                         });
-
                     }
-
-
                 }
             };
             statusTextView.setText("Retrieving calories, please wait...");
@@ -238,37 +233,36 @@ public class MainActivity extends AppCompatActivity {
 
     // Send message from child thread to activity main thread.
     // Because can not modify UI controls in child thread directly.
-    private void sendChildThreadMessageToMainThread(String rspMsg, final VwSettings XXXvws, TotalCalories total) {
+    private void sendChildThreadMessageToMainThread(String rspMsg, TotalCalories total) {
         final VwSettings vws = calculator.getSettings();
         calculator.setTotal(total);
 
-
-        TextView weightResultTextView = findViewById(R.id.weightResultTextView);
-        TextView bmrTextView = findViewById(R.id.bmrTextView);
-        TextView caloriesOutTextView = findViewById(R.id.caloriesOutTextView);
-        TextView caloriesInTextView = findViewById(R.id.caloriesInTextView);
-        TextView netCaloriesTextView = findViewById(R.id.netCaloriesTextView);
-        TextView netWeightTextView = findViewById(R.id.netWeightTextView);
-        TextView owTv = findViewById(R.id.overWeightTextView);
-        TextView nmTv = findViewById(R.id.nextMealTextView);
-        TextView rTv = findViewById(R.id.recomendationTextView);
-
-        TextView statusTextView = findViewById(R.id.statusTextView);
-
-        statusTextView.setText("Response: " + rspMsg + "TC=" + total);
-        if (total.getStatus() == TotalCalories.SUCCESS) {
-            double netWeight = calculator.getNetWeight();
-            weightResultTextView.setText(String.valueOf(netWeight));
-            bmrTextView.setText(String.valueOf(calculator.getBmrSinceMidnight()));
-            caloriesInTextView.setText(String.valueOf(total.getTotalCaloriesIn()));
-            caloriesOutTextView.setText(String.valueOf(total.getTotalCaloriesOut()));
-            netCaloriesTextView.setText(String.valueOf(calculator.getNetCalories()));
-            netWeightTextView.setText(String.valueOf(calculator.getNetWeightChange()));
-            setOverweightMessage(owTv, nmTv,rTv, netWeight, vws.getTargetWeight(), vws.getBmr());
-            statusTextView.setText("TC=" + total);
-     } else {
+        statusTextView.setText("Response: " + rspMsg + "TC=" + calculator.getTotal());
+        if (calculator.getTotal().getStatus() == TotalCalories.SUCCESS) {
+            refreshMainDisplay();
+            statusTextView.setText("TC=" + calculator.getTotal());
+        } else {
             statusTextView.setText("Unable to retreive calories. Check internet connection and login credentials");
         }
+    }
+
+    // Send message from child thread to activity main thread.
+    // Because can not modify UI controls in child thread directly.
+    private void refreshMainDisplay() {
+
+        if (calculator.getTotal() == null) {
+            //No calories retrieved to do calculation
+            statusTextView.setText("No calories retrieved to do calculation");
+            return;
+        }
+        double netWeight = calculator.getNetWeight();
+        weightResultTextView.setText(String.valueOf(netWeight));
+        bmrTextView.setText(String.valueOf(calculator.getBmrSinceMidnight()));
+        caloriesInTextView.setText(String.valueOf(calculator.getTotal().getTotalCaloriesIn()));
+        caloriesOutTextView.setText(String.valueOf(calculator.getTotal().getTotalCaloriesOut()));
+        netCaloriesTextView.setText(String.valueOf(calculator.getNetCalories()));
+        netWeightTextView.setText(String.valueOf(calculator.getNetWeightChange()));
+        setOverweightMessage(owTv, nmTv, rTv, netWeight, calculator.getSettings().getTargetWeight(), calculator.getSettings().getBmr());
     }
 
     double calcuateWeight(int weight, double bmr, int in, int out) {

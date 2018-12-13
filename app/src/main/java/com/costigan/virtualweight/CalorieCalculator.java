@@ -1,10 +1,13 @@
 package com.costigan.virtualweight;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import java.util.Calendar;
 
 class CalorieCalculator {
+    private static final int MAX_MEAL_CALORIES = 650;
+
     private VwSettings settings = null;
     private TotalCalories total = null;
 
@@ -33,19 +36,19 @@ class CalorieCalculator {
         return getTotalBmrToYesterday() + getBmrSinceMidnight();
     }
 
-    public int getTotalBmrToYesterday(){
+    public int getTotalBmrToYesterday() {
         int bmr = getSettings().getBmr();
         return bmr * total.getNumberOfDaysBeforeToday();
     }
 
     public int getBmrSinceMidnight() {
         int bmr = getSettings().getBmr();
-        return (int)((double)bmr * getFractionOfDay());
+        return (int) ((double) bmr * getFractionOfDay());
     }
 
     private static double getFractionOfDay() {
-        double d = getSecondsSinceMidnight() / (double)86400000;
-        return getRoundedValue(d,3);
+        double d = getSecondsSinceMidnight() / (double) 86400000;
+        return getRoundedValue(d, 3);
     }
 
     public static double getRoundedValue(double d, int places) {
@@ -67,10 +70,10 @@ class CalorieCalculator {
 
     public double getNetWeightChange() {
         //int bmr = getSettings().getBmr();
-        double netWeight = (double)getNetCalories() / (double)7700;
+        double netWeight = (double) getNetCalories() / (double) 7700;
         //Round to two decomal places
-        int intWeight = (int)(netWeight * 1000);
-        netWeight = (double)intWeight/(double)1000;
+        int intWeight = (int) (netWeight * 1000);
+        netWeight = (double) intWeight / (double) 1000;
         return netWeight;
     }
 
@@ -79,5 +82,35 @@ class CalorieCalculator {
     }
 
 
+    //get days
+    public RecommendationStats getRecommendationStats() {
+        double currentWeight = getNetWeight();
+        double targetWeight =  getSettings().getTargetWeight();
+        int bmr = getSettings().getBmr();
+
+        RecommendationStats stats = new RecommendationStats();
+
+        stats.overweight = currentWeight - targetWeight;
+        stats.overweightCalories = stats.overweight * 7700;
+        stats.overweightPercentage = (stats.overweight / targetWeight) * 100;
+        stats.maxSafeWeightLoss = 750; //kcal = 0.7 kg / week = 1.7 lbs week
+
+        stats.days = stats.overweightCalories / stats.maxSafeWeightLoss;
+        stats.fastingMinutes = (stats.overweightCalories / bmr) * 60 * 24;
+        stats.minutesToNextMeal = ((stats.overweightCalories + MAX_MEAL_CALORIES) / bmr) * 60 * 24;
+        stats.now = DateTime.now();
+        return stats;
+    }
+
+    class RecommendationStats{
+        double overweight;
+        double overweightCalories;
+        double overweightPercentage;
+        double maxSafeWeightLoss;
+        double days;
+        double fastingMinutes;
+        double minutesToNextMeal;
+        DateTime now;
+    }
 
 }
