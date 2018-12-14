@@ -1,11 +1,15 @@
 package com.costigan.virtualweight;
 
+import com.google.gson.annotations.Expose;
+
 import org.joda.time.LocalDate;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
-public class TotalCalories {
+public class TotalCalories implements Serializable {
 
+    public final static String TOTAL_CALORIES_OBJECT = "TOTAL_CALORIES_OBJECT";
     public static final int SUCCESS = 0;
     public static int FAILURE = -1;
 
@@ -13,17 +17,17 @@ public class TotalCalories {
     //DateTimeFormatter formatter = DateTimeFormatter.ofPattern(null,null);
 
 
-    private int bmr = 0;
+    @Expose private int bmr = 0;
     //Historic calculation up to teh latest day at midnight before today
     private LocalDate latestDateMidnightBeforeToday = null;
-    private int numberOfDaysBeforeToday = 0;
-    private int historticCaloriesIn = 0;
-    private int historicCaloriesOut = 0;
+    @Expose private int numberOfDaysBeforeToday = 0;
+    @Expose private int historticCaloriesIn = 0;
+    @Expose private int historicCaloriesOut = 0;
 
     //Todays calculation
     private LocalDate today = null;
-    private int todayCaloriesIn = 0;
-    private int todayCaloriesOut = 0;
+    @Expose private int todayCaloriesIn = 0;
+    @Expose private int todayCaloriesOut = 0;
 
     public LocalDate getLatestDateMidnightBeforeToday() {
         return latestDateMidnightBeforeToday;

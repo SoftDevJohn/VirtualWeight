@@ -2,14 +2,19 @@ package com.costigan.virtualweight;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.content.Context;
 
-import org.joda.time.DateTime;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.joda.time.LocalDate;
 
 import java.io.FileNotFoundException;
@@ -52,7 +57,63 @@ public class MainActivity extends AppCompatActivity {
         owTv = findViewById(R.id.overWeightTextView);
         nmTv = findViewById(R.id.nextMealTextView);
         rTv = findViewById(R.id.recomendationTextView);
+
+        restoreState();
+        refreshMainDisplay();
+
     }
+
+    /**
+     * Save a JSON representation of TotalCalories in internal storage
+     * Onlt preserve the fields marked as @Expose
+     * When a new session of Vw starts, it will automatically reload this.
+     */
+    private void saveTotalCaloriesState(){
+        Context context = getApplicationContext();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefsEditor = preferences.edit();
+        TotalCalories tc = calculator.getTotal();
+        VwSettings vws = calculator.getSettings();
+
+        if( (tc == null) || (vws == null )){
+            statusTextView.setText("nulaaaaa");
+            return;
+        }
+
+        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+        String totalCaloriesAsJson = gson.toJson(tc);
+        String settingsAsJson = gson.toJson(vws);
+
+        prefsEditor.putString(TotalCalories.TOTAL_CALORIES_OBJECT, totalCaloriesAsJson);
+        prefsEditor.commit();
+        statusTextView.setText("Test persistence: " + totalCaloriesAsJson);
+    }
+
+
+    /**
+     * Retrive JSON string of TotalCalories object from internal storage
+     */
+    private void restoreState(){
+        Context context = getApplicationContext();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Gson gson = new Gson();
+        String json = preferences.getString(TotalCalories.TOTAL_CALORIES_OBJECT, "");
+        if( json.isEmpty()){
+            //Object not found, so dont do anything
+            return;
+        }
+        TotalCalories tc = gson.fromJson(json, TotalCalories.class);
+        try {
+            VwSettings vws = getVwSettings();
+            calculator.setTotal(tc);
+            calculator.setSettings(vws);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        statusTextView.setText("Test persistence retrieved: " + tc.toString());
+    }
+
 
     /**
      * Called when the user taps the Weigh In button
@@ -128,18 +189,6 @@ public class MainActivity extends AppCompatActivity {
     private void setOverweightMessage(TextView owTv, TextView nmTv, TextView rTv, double currentWeight, double targetWeight, double bmr) {
 
         CalorieCalculator.RecommendationStats stats = calculator.getRecommendationStats();
-        /*
-        double overweight = currentWeight - targetWeight;
-        double overweightCalories = overweight * 7700;
-        double overweightPercentage = (overweight / targetWeight) * 100;
-        double maxSafeWeightLoss = 750; //kcal = 0.7 kg / week = 1.7 lbs week
-
-        double days = overweightCalories / maxSafeWeightLoss;
-        double fastingMinutes = (overweightCalories / bmr) * 60 * 24;
-        double minutesToNextMeal = ((overweightCalories + MAX_MEAL_CALORIES) / bmr) * 60 * 24;
-        DateTime now = DateTime.now();
-        */
-
         String overWeightMsg = String.format("%.2f kg (%.0f kcal or %.0f %%)", Math.abs(stats.overweight), Math.abs(stats.overweightCalories), Math.abs(stats.overweightPercentage));
 
         if (stats.minutesToNextMeal > 0) {
@@ -173,8 +222,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
-
     //Testing threading
     public void calculateWeight(View view) {
 
@@ -185,13 +232,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             //final to allow the child chread to access it
-            final VwFileManager fm = new VwFileManager();
-
-            //Now read from this file
-            StringBuffer stringBuffer = new StringBuffer();
-            Context ctx = getApplicationContext();
-            fm.readFile(ctx, VwFileManager.SETTINGS_FILE, stringBuffer);
-            final VwSettings settings = new VwSettings(stringBuffer.toString().trim());
+            final VwSettings settings = getVwSettings();
             calculator.setSettings(settings);
             LocalDate dayAfterStartDate = settings.getDayAfterStartDate();
 
@@ -231,6 +272,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @NonNull
+    private VwSettings getVwSettings() throws Exception {
+        final VwFileManager fm = new VwFileManager();
+
+        //Now read from this file
+        StringBuffer stringBuffer = new StringBuffer();
+        Context ctx = getApplicationContext();
+        fm.readFile(ctx, VwFileManager.SETTINGS_FILE, stringBuffer);
+        return new VwSettings(stringBuffer.toString().trim());
+    }
+
     // Send message from child thread to activity main thread.
     // Because can not modify UI controls in child thread directly.
     private void sendChildThreadMessageToMainThread(String rspMsg, TotalCalories total) {
@@ -240,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
         statusTextView.setText("Response: " + rspMsg + "TC=" + calculator.getTotal());
         if (calculator.getTotal().getStatus() == TotalCalories.SUCCESS) {
             refreshMainDisplay();
+            saveTotalCaloriesState();
             statusTextView.setText("TC=" + calculator.getTotal());
         } else {
             statusTextView.setText("Unable to retreive calories. Check internet connection and login credentials");

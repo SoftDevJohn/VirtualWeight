@@ -31,4 +31,6 @@ dependencies {
     //compile 'org.jsoup:jsoup:1.10.3'
     implementation 'org.jsoup:jsoup:1.11.3'
     implementation 'joda-time:joda-time:2.9.4'
+    implementation 'com.google.code.gson:gson:2.6.2'
+
 }
