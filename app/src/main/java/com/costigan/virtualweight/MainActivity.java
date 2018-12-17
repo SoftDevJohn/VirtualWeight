@@ -18,12 +18,16 @@ import com.google.gson.GsonBuilder;
 import org.joda.time.LocalDate;
 
 import java.io.FileNotFoundException;
+import java.net.UnknownHostException;
 
 import static com.costigan.virtualweight.VwFileManager.SETTINGS_FILE;
 
 public class MainActivity extends AppCompatActivity {
     public static final String WEIGHT_RESULT = "com.costigan.virtualweight.WEIGHT_RESULT";
 
+    enum RetreiveCaloriesStatus {
+        SUCCESS,FAIL,UNKNOWN_HOST;
+    }
     CalorieCalculator calculator = new CalorieCalculator();
     TextView statusTextView = null;
 
@@ -250,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                sendChildThreadMessageToMainThread("", total);
+                                sendChildThreadMessageToMainThread(RetreiveCaloriesStatus.SUCCESS,"", total);
                             }
                         });
 
@@ -258,12 +262,17 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                sendChildThreadMessageToMainThread("Ex=" + ex, null);
+                                if( ex instanceof UnknownHostException) {
+                                    sendChildThreadMessageToMainThread(RetreiveCaloriesStatus.UNKNOWN_HOST, "Ex=" + ex, null);
+                                }else{
+                                    sendChildThreadMessageToMainThread(RetreiveCaloriesStatus.FAIL, "Ex=" + ex, null);
+                                }
                             }
                         });
-                    }
+                    };
                 }
             };
+
             statusTextView.setText("Retrieving calories, please wait...");
             okHttpExecuteThread.start();
 
@@ -285,7 +294,17 @@ public class MainActivity extends AppCompatActivity {
 
     // Send message from child thread to activity main thread.
     // Because can not modify UI controls in child thread directly.
-    private void sendChildThreadMessageToMainThread(String rspMsg, TotalCalories total) {
+    private void sendChildThreadMessageToMainThread(RetreiveCaloriesStatus status, String rspMsg, TotalCalories total) {
+        if(status == RetreiveCaloriesStatus.UNKNOWN_HOST){
+            statusTextView.setText("Unable to connect to retrieve calories");
+            return;
+        }
+
+        if(total == null){
+            statusTextView.setText("Unable to retrieve calories. (TotalCalories is null)");
+            return;
+        }
+
         final VwSettings vws = calculator.getSettings();
         calculator.setTotal(total);
 
