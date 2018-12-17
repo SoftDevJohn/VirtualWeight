@@ -1,4 +1,4 @@
-package com.costigan.virtualweight;
+package com.costigan.virtualweight.gson;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

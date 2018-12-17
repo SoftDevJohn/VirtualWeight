@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.content.Context;
 
+import com.costigan.virtualweight.gson.GsonLocalDateSerializerAdapter;
+import com.costigan.virtualweight.gson.GsonLocalDateDeserializerAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -86,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
         Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
-                .registerTypeAdapter(LocalDate.class, new GsonLocalDateAdapter())
+                .registerTypeAdapter(LocalDate.class, new GsonLocalDateSerializerAdapter())
                 .create();
         String totalCaloriesAsJson = gson.toJson(tc);
 

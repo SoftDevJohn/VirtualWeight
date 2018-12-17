@@ -1,4 +1,4 @@
-package com.costigan.virtualweight;
+package com.costigan.virtualweight.gson;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Used to support the conversion of LocalDate to Gson date
  */
-class GsonLocalDateAdapter implements JsonSerializer<LocalDate> {
+public class GsonLocalDateSerializerAdapter implements JsonSerializer<LocalDate> {
 
     public JsonElement serialize(LocalDate date, Type typeOfSrc, JsonSerializationContext context) {
         return new JsonPrimitive(date.toString("yyyy-MM-dd"));
