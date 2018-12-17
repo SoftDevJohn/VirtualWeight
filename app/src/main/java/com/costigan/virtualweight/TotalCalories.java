@@ -25,7 +25,7 @@ public class TotalCalories implements Serializable {
     @Expose private int historicCaloriesOut = 0;
 
     //Todays calculation
-    private LocalDate today = null;
+    @Expose private LocalDate today = null;
     @Expose private int todayCaloriesIn = 0;
     @Expose private int todayCaloriesOut = 0;
 

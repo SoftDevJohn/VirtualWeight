@@ -80,18 +80,22 @@ public class MainActivity extends AppCompatActivity {
         VwSettings vws = calculator.getSettings();
 
         if( (tc == null) || (vws == null )){
-            statusTextView.setText("nulaaaaa");
+            statusTextView.setText("Unable to save state of null calories");
             return;
         }
 
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .registerTypeAdapter(LocalDate.class, new GsonLocalDateAdapter())
+                .create();
         String totalCaloriesAsJson = gson.toJson(tc);
-        String settingsAsJson = gson.toJson(vws);
 
         prefsEditor.putString(TotalCalories.TOTAL_CALORIES_OBJECT, totalCaloriesAsJson);
         prefsEditor.commit();
         statusTextView.setText("Test persistence: " + totalCaloriesAsJson);
+
     }
+
 
 
     /**
@@ -100,13 +104,22 @@ public class MainActivity extends AppCompatActivity {
     private void restoreState(){
         Context context = getApplicationContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Gson gson = new Gson();
+//        Gson gson = new Gson();
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .registerTypeAdapter(LocalDate.class, new GsonLocalDateDeserializerAdapter())
+                .create();
+
+
+
         String json = preferences.getString(TotalCalories.TOTAL_CALORIES_OBJECT, "");
+
         if( json.isEmpty()){
             //Object not found, so dont do anything
             return;
         }
         TotalCalories tc = gson.fromJson(json, TotalCalories.class);
+
         try {
             VwSettings vws = getVwSettings();
             calculator.setTotal(tc);
@@ -119,9 +132,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * Called when the user taps the Weigh In button
-     */
+        /**
+         * Called when the user taps the Weigh In button
+         */
     public void changeSettings(View view) {
 
         //Open the Settings Screem
