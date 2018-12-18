@@ -31,8 +31,9 @@ public class MainActivity extends AppCompatActivity {
     public static final String WEIGHT_RESULT = "com.costigan.virtualweight.WEIGHT_RESULT";
 
     enum RetreiveCaloriesStatus {
-        SUCCESS,FAIL,UNKNOWN_HOST;
+        SUCCESS, FAIL, UNKNOWN_HOST;
     }
+
     CalorieCalculator calculator = new CalorieCalculator();
     TextView statusTextView = null;
 
@@ -91,26 +92,29 @@ public class MainActivity extends AppCompatActivity {
                 //statusTextView.setText("Settings");
                 changeSettings();
                 return true;
+            case R.id.history:
+                //statusTextView.setText("Settings");
+                browseDb();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
 
-
     /**
-         * Save a JSON representation of TotalCalories in internal storage
-         * Onlt preserve the fields marked as @Expose
-         * When a new session of Vw starts, it will automatically reload this.
-         */
-    private void saveTotalCaloriesState(){
+     * Save a JSON representation of TotalCalories in internal storage
+     * Onlt preserve the fields marked as @Expose
+     * When a new session of Vw starts, it will automatically reload this.
+     */
+    private void saveTotalCaloriesState() {
         Context context = getApplicationContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor prefsEditor = preferences.edit();
         TotalCalories tc = calculator.getTotal();
         VwSettings vws = calculator.getSettings();
 
-        if( (tc == null) || (vws == null )){
+        if ((tc == null) || (vws == null)) {
             statusTextView.setText("Unable to save state of null calories");
             return;
         }
@@ -128,11 +132,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     /**
      * Retrive JSON string of TotalCalories object from internal storage
      */
-    private void restoreState(){
+    private void restoreState() {
         Context context = getApplicationContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 //        Gson gson = new Gson();
@@ -142,10 +145,9 @@ public class MainActivity extends AppCompatActivity {
                 .create();
 
 
-
         String json = preferences.getString(TotalCalories.TOTAL_CALORIES_OBJECT, "");
 
-        if( json.isEmpty()){
+        if (json.isEmpty()) {
             //Object not found, so dont do anything
             return;
         }
@@ -162,15 +164,19 @@ public class MainActivity extends AppCompatActivity {
         statusTextView.setText("Test persistence retrieved: " + tc.toString());
     }
 
+    /**
+     * Called when the user taps the Weigh In button
+     */
+    public void browseDb() {
 
-
-        /**
-         * Called when the user taps the Weigh In button
-         */
-        public void changeSettings(View view) {
-            changeSettings();
-        }
-        public void changeSettings() {
+        //Open the Settings Screem
+        Intent intent = new Intent(this, DatabaseActivity.class);
+        startActivityForResult(intent, 1);
+    }
+    /**
+     * Called when the user taps the Weigh In button
+     */
+    public void changeSettings() {
 
         //Open the Settings Screem
         Intent intent = new Intent(this, DisplaySettingsActivity.class);
@@ -274,10 +280,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
     //Testing threading
-    public void calculateWeight(View view) {
-        calculateWeight();
-    }
     public void calculateWeight() {
 
         VirtualWeight vw = new VirtualWeight();
@@ -305,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                sendChildThreadMessageToMainThread(RetreiveCaloriesStatus.SUCCESS,"", total);
+                                sendChildThreadMessageToMainThread(RetreiveCaloriesStatus.SUCCESS, "", total);
                             }
                         });
 
@@ -313,14 +317,15 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if( ex instanceof UnknownHostException) {
+                                if (ex instanceof UnknownHostException) {
                                     sendChildThreadMessageToMainThread(RetreiveCaloriesStatus.UNKNOWN_HOST, "Ex=" + ex, null);
-                                }else{
+                                } else {
                                     sendChildThreadMessageToMainThread(RetreiveCaloriesStatus.FAIL, "Ex=" + ex, null);
                                 }
                             }
                         });
-                    };
+                    }
+                    ;
                 }
             };
 
@@ -346,12 +351,12 @@ public class MainActivity extends AppCompatActivity {
     // Send message from child thread to activity main thread.
     // Because can not modify UI controls in child thread directly.
     private void sendChildThreadMessageToMainThread(RetreiveCaloriesStatus status, String rspMsg, TotalCalories total) {
-        if(status == RetreiveCaloriesStatus.UNKNOWN_HOST){
+        if (status == RetreiveCaloriesStatus.UNKNOWN_HOST) {
             statusTextView.setText("Unable to connect to retrieve calories");
             return;
         }
 
-        if(total == null){
+        if (total == null) {
             statusTextView.setText("Unable to retrieve calories. (TotalCalories is null)");
             return;
         }
