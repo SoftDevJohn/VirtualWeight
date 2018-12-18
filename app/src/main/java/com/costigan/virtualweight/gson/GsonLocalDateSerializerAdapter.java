@@ -13,7 +13,6 @@ import org.joda.time.LocalDate;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Used to support the conversion of LocalDate to Gson date

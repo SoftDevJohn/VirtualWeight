@@ -8,6 +8,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.content.Context;
@@ -69,11 +72,37 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.opt_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.sync:
+                //statusTextView.setText("Sync");
+                calculateWeight();
+                return true;
+            case R.id.settings:
+                //statusTextView.setText("Settings");
+                changeSettings();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+
     /**
-     * Save a JSON representation of TotalCalories in internal storage
-     * Onlt preserve the fields marked as @Expose
-     * When a new session of Vw starts, it will automatically reload this.
-     */
+         * Save a JSON representation of TotalCalories in internal storage
+         * Onlt preserve the fields marked as @Expose
+         * When a new session of Vw starts, it will automatically reload this.
+         */
     private void saveTotalCaloriesState(){
         Context context = getApplicationContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -134,10 +163,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
         /**
          * Called when the user taps the Weigh In button
          */
-    public void changeSettings(View view) {
+        public void changeSettings(View view) {
+            changeSettings();
+        }
+        public void changeSettings() {
 
         //Open the Settings Screem
         Intent intent = new Intent(this, DisplaySettingsActivity.class);
@@ -243,6 +276,9 @@ public class MainActivity extends AppCompatActivity {
     }
     //Testing threading
     public void calculateWeight(View view) {
+        calculateWeight();
+    }
+    public void calculateWeight() {
 
         VirtualWeight vw = new VirtualWeight();
         vw.calcuateWeight();
