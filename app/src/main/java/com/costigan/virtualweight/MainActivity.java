@@ -13,11 +13,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 import android.content.Context;
 
-import com.costigan.virtualweight.db.WordListAdapter;
 import com.costigan.virtualweight.gson.GsonLocalDateSerializerAdapter;
 import com.costigan.virtualweight.gson.GsonLocalDateDeserializerAdapter;
 import com.google.gson.Gson;
@@ -99,14 +97,14 @@ public class MainActivity extends AppCompatActivity {
                 //statusTextView.setText("Settings");
                 browseDb();
                 return true;
-            case R.id.test:
-                //https://codelabs.developers.google.com/codelabs/android-room-with-a-view/#0
-                statusTextView.setText("Test");
-                RecyclerView recyclerView = findViewById(R.id.recyclerview);
-                final WordListAdapter adapter = new WordListAdapter(this);
-                recyclerView.setAdapter(adapter);
-                recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                return true;
+//            case R.id.test:
+//                //https://codelabs.developers.google.com/codelabs/android-room-with-a-view/#0
+//                statusTextView.setText("Test");
+//                RecyclerView recyclerView = findViewById(R.id.recyclerview);
+//                final WordListAdapter adapter = new WordListAdapter(this);
+//                recyclerView.setAdapter(adapter);
+//                recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -181,8 +179,8 @@ public class MainActivity extends AppCompatActivity {
     public void browseDb() {
 
         //Open the Settings Screem
-        Intent intent = new Intent(this, DatabaseActivity.class);
-        startActivityForResult(intent, 1);
+//        Intent intent = new Intent(this, DatabaseActivity.class);
+//        startActivityForResult(intent, 1);
     }
     /**
      * Called when the user taps the Weigh In button
