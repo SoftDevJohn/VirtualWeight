@@ -11,4 +11,9 @@
         android:title="Settings" />
     <item android:id="@+id/history"
         android:title="History" />
+
+    <item android:id="@+id/test"
+        android:title="Test" />
+
+
 </menu>
