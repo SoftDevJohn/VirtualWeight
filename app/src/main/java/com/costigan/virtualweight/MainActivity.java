@@ -18,6 +18,7 @@ import android.content.Context;
 
 import com.costigan.virtualweight.gson.GsonLocalDateSerializerAdapter;
 import com.costigan.virtualweight.gson.GsonLocalDateDeserializerAdapter;
+import com.costigan.virtualweight.ui.DatabaseListActivity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -181,6 +182,11 @@ public class MainActivity extends AppCompatActivity {
         //Open the Settings Screem
 //        Intent intent = new Intent(this, DatabaseActivity.class);
 //        startActivityForResult(intent, 1);
+
+        Intent intent = new Intent(this, DatabaseListActivity.class);
+        startActivityForResult(intent, 1);
+
+
     }
     /**
      * Called when the user taps the Weigh In button
