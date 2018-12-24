@@ -42,7 +42,7 @@ public class MfpScreenScraper implements ScreenScraper {
 
     private TotalCalories getTotalCaloriesForDates(LocalDate fromDate, LocalDate toDate) throws Exception {
         TotalCalories tc = new TotalCalories();
-        List<Calorie> list = getCaloriesForDates(fromDate, toDate);
+        List<Calorie> list = getCaloriesForDateRange(fromDate, toDate);
 
         tc.setNumberOfDaysBeforeToday(0);
         tc.setHistorticCaloriesIn(0);
@@ -69,17 +69,30 @@ public class MfpScreenScraper implements ScreenScraper {
     }
 
 
+    /**
+     * Create a list of dates for the given parameters.
+     * @param fromDate
+     * @param toDate
+     * @return
+     * @throws Exception
+     */
+    private List<Calorie> getCaloriesForDateRange(LocalDate fromDate, LocalDate toDate) throws Exception {
 
+        List<LocalDate> retrievalDates =  new ArrayList<LocalDate>();
+        for (LocalDate searchDate = fromDate; (searchDate.isBefore(toDate) || searchDate.isEqual(toDate)); searchDate = searchDate.plusDays(1)) {
+            retrievalDates.add(searchDate);
+        }
 
+        return getCaloriesForDateList(retrievalDates);
 
-
+    }
 
 
     /**
      * GOOD
      * Replace with an explicit list.
      */
-    private List<Calorie> getCaloriesForDates(LocalDate fromDate, LocalDate toDate) throws Exception {
+    public List<Calorie> getCaloriesForDateList(List<LocalDate> retrievalDates) throws Exception {
         List<Calorie> list = new ArrayList<Calorie>();
         String url = VwConstants.URL_LOGIN;
 
@@ -95,7 +108,7 @@ public class MfpScreenScraper implements ScreenScraper {
         Map<String, String> cookies = res.cookies();
 
         // now iterate over each date
-        for (LocalDate searchDate = fromDate; (searchDate.isBefore(toDate) || searchDate.isEqual(toDate)); searchDate = searchDate.plusDays(1)) {
+        for (LocalDate searchDate : retrievalDates) {
             Calorie calorie = new Calorie();
             list.add(calorie);
 
