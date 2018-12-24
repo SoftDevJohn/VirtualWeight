@@ -1,6 +1,7 @@
 package com.costigan.virtualweight;
 
 import android.app.Activity;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -16,8 +17,10 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.content.Context;
 
+import com.costigan.virtualweight.db.DbCalorie;
 import com.costigan.virtualweight.gson.GsonLocalDateSerializerAdapter;
 import com.costigan.virtualweight.gson.GsonLocalDateDeserializerAdapter;
+import com.costigan.virtualweight.mvc.CalorieViewModel;
 import com.costigan.virtualweight.ui.DatabaseListActivity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,6 +29,8 @@ import org.joda.time.LocalDate;
 
 import java.io.FileNotFoundException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.costigan.virtualweight.VwFileManager.SETTINGS_FILE;
 
@@ -38,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
 
     CalorieCalculator calculator = new CalorieCalculator();
     TextView statusTextView = null;
+    private ScreenScraper ss;
+    private CalorieViewModel mCalorieViewModel;
+
+
 
     //https://www.livestrong.com/article/519568-does-slim-fast-curb-your-appetite/?ajax=1&is=1
     //3 X 650 meals + 2 x 200 snacks
@@ -58,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ss = MfpScreenScraper.getInstance();
+        mCalorieViewModel = ViewModelProviders.of(this).get(CalorieViewModel.class);
 
         statusTextView = findViewById(R.id.statusTextView);
         weightResultTextView = findViewById(R.id.weightResultTextView);
@@ -98,7 +109,14 @@ public class MainActivity extends AppCompatActivity {
                 //statusTextView.setText("Settings");
                 browseDb();
                 return true;
-//            case R.id.test:
+            case R.id.restore:
+                //Overwrite the database
+                statusTextView.setText("Overwrite the database");
+                restoreDb();
+                //browseDb();
+                return true;
+
+                //            case R.id.test:
 //                //https://codelabs.developers.google.com/codelabs/android-room-with-a-view/#0
 //                statusTextView.setText("Test");
 //                RecyclerView recyclerView = findViewById(R.id.recyclerview);
@@ -188,6 +206,36 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    /**
+     * Destroy database and overwrite with all values from Mfp
+     *
+     */
+    public void restoreDb() {
+        List<DbCalorie> dbCalorieList = new ArrayList<DbCalorie>();
+        DbCalorie calorie;
+        calorie = new DbCalorie("2018-01-01",10001,20001);
+        dbCalorieList.add(calorie);
+        calorie = new DbCalorie("2018-01-02",10002,20002);
+        dbCalorieList.add(calorie);
+        calorie = new DbCalorie("2018-01-03",10003,20003);
+        dbCalorieList.add(calorie);
+        mCalorieViewModel.overwriteAllCalories(dbCalorieList);
+
+                    /*
+            mDao.deleteAll();
+
+            DbCalorie calorie = new DbCalorie("2018-01-01",100,200);
+            mDao.insert(calorie);
+            calorie = new DbCalorie("2018-01-02",150,300);
+            mDao.insert(calorie);
+            */
+
+
+    }
+
+
+
     /**
      * Called when the user taps the Weigh In button
      */
@@ -231,6 +279,8 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+
 
     //Handle the results from the Update settings dialog
     @Override
@@ -302,7 +352,8 @@ public class MainActivity extends AppCompatActivity {
         VirtualWeight vw = new VirtualWeight();
         vw.calcuateWeight();
         WeightResultDto dto = vw.getWeight();
-        final ScreenScraper ss = new MfpScreenScraper();
+
+        //final ScreenScraper ss = new MfpScreenScraper();
 
 
         try {

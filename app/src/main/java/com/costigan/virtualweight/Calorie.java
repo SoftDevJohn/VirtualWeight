@@ -63,7 +63,7 @@ public class Calorie {
 
     @Override
     public String toString() {
-        return "Calorie{" +
+        return "DbCalorie{" +
                 "date=" + date +
                 ", caloriesIn=" + caloriesIn +
                 ", caloriesOut=" + caloriesOut +

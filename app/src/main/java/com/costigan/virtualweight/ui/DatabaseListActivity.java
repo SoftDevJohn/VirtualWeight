@@ -14,7 +14,7 @@ import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.costigan.virtualweight.R;
-import com.costigan.virtualweight.db.Calorie;
+import com.costigan.virtualweight.db.DbCalorie;
 import com.costigan.virtualweight.mvc.CalorieListAdapter;
 import com.costigan.virtualweight.mvc.CalorieViewModel;
 
@@ -71,9 +71,9 @@ public class DatabaseListActivity extends AppCompatActivity implements EditCalor
         // Add an observer on the LiveData returned by getAlphabetizedWords.
         // The onChanged() method fires when the observed data changes and the activity is
         // in the foreground.
-        mCalorieViewModel.getAllWords().observe(this, new Observer<List<Calorie>>() {
+        mCalorieViewModel.getAllWords().observe(this, new Observer<List<DbCalorie>>() {
             @Override
-            public void onChanged(@Nullable final List<Calorie> calories) {
+            public void onChanged(@Nullable final List<DbCalorie> calories) {
                 // Update the cached copy of the calories in the adapter.
                 adapter.setWords(calories);
             }
@@ -99,7 +99,7 @@ public class DatabaseListActivity extends AppCompatActivity implements EditCalor
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == NEW_WORD_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            Calorie calorie = new Calorie(data.getStringExtra(EditCalorieActivity.EXTRA_REPLY),
+            DbCalorie calorie = new DbCalorie(data.getStringExtra(EditCalorieActivity.EXTRA_REPLY),
                     data.getIntExtra(EXTRA_CALS_IN, 0),
                     data.getIntExtra(EXTRA_CALS_OUT, 0)
 

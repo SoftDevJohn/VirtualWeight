@@ -5,12 +5,11 @@ import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.costigan.virtualweight.db.Calorie;
+import com.costigan.virtualweight.db.DbCalorie;
 import com.costigan.virtualweight.ui.EditCalorieContextMenuListener;
 //import com.example.android.roomwordssample.R;
 import com.costigan.virtualweight.R;
@@ -56,7 +55,7 @@ public class CalorieListAdapter extends RecyclerView.Adapter<CalorieListAdapter.
     }
 
     private final LayoutInflater mInflater;
-    private List<Calorie> mCalories = Collections.emptyList(); // Cached copy of words
+    private List<DbCalorie> mCalories = Collections.emptyList(); // Cached copy of words
 
     public CalorieListAdapter(Context context) {
         mInflater = LayoutInflater.from(context);
@@ -71,11 +70,11 @@ public class CalorieListAdapter extends RecyclerView.Adapter<CalorieListAdapter.
 
     @Override
     public void onBindViewHolder(WordViewHolder holder, int position) {
-        Calorie current = mCalories.get(position);
+        DbCalorie current = mCalories.get(position);
         holder.wordItemView.setText(current.getWord() + "\t\t" + current.getCaloriesIn() + "\t\t" + current.getCaloriesOut());
     }
 
-    public void setWords(List<Calorie> calories) {
+    public void setWords(List<DbCalorie> calories) {
         mCalories = calories;
         notifyDataSetChanged();
     }

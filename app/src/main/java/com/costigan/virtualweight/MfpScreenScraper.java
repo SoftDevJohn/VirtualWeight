@@ -26,6 +26,21 @@ public class MfpScreenScraper implements ScreenScraper {
 
 
 
+        //Singleton patter
+        private static MfpScreenScraper instance;
+
+        //Prevent deafult constrction
+        private MfpScreenScraper(){}
+
+        public static MfpScreenScraper getInstance(){
+            if(instance == null){
+                instance = new MfpScreenScraper();
+            }
+            return instance;
+        }
+
+
+
     /**
      * Return an object coontaining the list of Calories from the given date up to today.
      * @param fromDate

@@ -2,7 +2,6 @@ package com.costigan.virtualweight.db;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Update;
 import android.os.AsyncTask;
 
 import java.util.List;
@@ -17,7 +16,7 @@ import java.util.concurrent.Executors;
 public class CalorieRepository {
 
     private CalorieDao mCalorieDao;
-    private LiveData<List<Calorie>> mAllWords;
+    private LiveData<List<DbCalorie>> mAllWords;
 
     // Note that in order to unit test the CalorieRepository, you have to remove the Application
     // dependency. This adds complexity and much more code, and this sample is not about testing.
@@ -31,14 +30,14 @@ public class CalorieRepository {
 
     // Room executes all queries on a separate thread.
     // Observed LiveData will notify the observer when the data has changed.
-    public LiveData<List<Calorie>> getAllWords() {
+    public LiveData<List<DbCalorie>> getAllWords() {
         return mAllWords;
     }
 
     // You must call this on a non-UI thread or your app will crash.
     // Like this, Room ensures that you're not doing any long running operations on the main
     // thread, blocking the UI.
-    public void insert(Calorie calorie) {
+    public void insert(DbCalorie calorie) {
         new insertAsyncTask(mCalorieDao).execute(calorie);
     }
 
@@ -47,7 +46,7 @@ public class CalorieRepository {
     // You must call this on a non-UI thread or your app will crash.
     // Like this, Room ensures that you're not doing any long running operations on the main
     // thread, blocking the UI.
-    public void update(final Calorie calorie) {
+    public void update(final DbCalorie calorie) {
         //new UpdateAsyncTask(mCalorieDao).execute(calorie);
         //new insertAsyncTask(mCalorieDao).execute(calorie);
         executor.execute(
@@ -61,8 +60,22 @@ public class CalorieRepository {
 
     }
 
+    public void deleteAll() {
+        //new UpdateAsyncTask(mCalorieDao).execute(calorie);
+        //new insertAsyncTask(mCalorieDao).execute(calorie);
+        executor.execute(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        mCalorieDao.deleteAll();
+                    }
+                }
+        );
 
-    private static class insertAsyncTask extends AsyncTask<Calorie, Void, Void> {
+    }
+
+
+    private static class insertAsyncTask extends AsyncTask<DbCalorie, Void, Void> {
 
         private CalorieDao mAsyncTaskDao;
 
@@ -71,7 +84,7 @@ public class CalorieRepository {
         }
 
         @Override
-        protected Void doInBackground(final Calorie... params) {
+        protected Void doInBackground(final DbCalorie... params) {
             mAsyncTaskDao.insert(params[0]);
             return null;
         }

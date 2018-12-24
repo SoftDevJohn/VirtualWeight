@@ -13,7 +13,7 @@ import android.support.annotation.NonNull;
  * The fact that this has very few comments emphasizes its coolness.
  */
 
-@Database(entities = {Calorie.class}, version = 3)
+@Database(entities = {DbCalorie.class}, version = 3)
 public abstract class CalorieRoomDatabase extends RoomDatabase {
 
     public abstract CalorieDao wordDao();
@@ -75,9 +75,9 @@ public abstract class CalorieRoomDatabase extends RoomDatabase {
             /*
             mDao.deleteAll();
 
-            Calorie calorie = new Calorie("2018-01-01",100,200);
+            DbCalorie calorie = new DbCalorie("2018-01-01",100,200);
             mDao.insert(calorie);
-            calorie = new Calorie("2018-01-02",150,300);
+            calorie = new DbCalorie("2018-01-02",150,300);
             mDao.insert(calorie);
             */
             return null;

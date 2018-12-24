@@ -17,7 +17,7 @@ import android.support.annotation.NonNull;
  */
 
 @Entity(tableName = "calorie_table")
-public class Calorie {
+public class DbCalorie {
 
     @PrimaryKey
     @NonNull
@@ -32,7 +32,7 @@ public class Calorie {
     @ColumnInfo(name = "calories_out")
     private Integer caloriesOut;
 
-    public Calorie(@NonNull String word, @NonNull Integer caloriesIn, @NonNull Integer caloriesOut) {
+    public DbCalorie(@NonNull String word, @NonNull Integer caloriesIn, @NonNull Integer caloriesOut) {
         this.mWord = word;
         this.caloriesIn = caloriesIn;
         this.caloriesOut = caloriesOut;

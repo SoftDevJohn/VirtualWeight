@@ -24,19 +24,19 @@ public interface CalorieDao {
     // Always holds/caches latest version of data. Notifies its active observers when the
     // data has changed. Since we are getting all the contents of the database,
     // we are notified whenever any of the database contents have changed.
-    @Query("SELECT * from calorie_table ORDER BY word ASC")
-    LiveData<List<Calorie>> getAlphabetizedWords();
+    @Query("SELECT * from CALORIE_TABLE ORDER BY word ASC")
+    LiveData<List<DbCalorie>> getAlphabetizedWords();
 
     // We do not need a conflict strategy, because the calorie is our primary key, and you cannot
     // add two items with the same primary key to the database. If the table has more than one
     // column, you can use @Insert(onConflict = OnConflictStrategy.REPLACE) to update a row.
     @Insert
-    void insert(Calorie calorie);
+    void insert(DbCalorie calorie);
 
-    @Query("DELETE FROM calorie_table")
+    @Query("DELETE FROM CALORIE_TABLE")
     void deleteAll();
 
     @Update
-    void update(Calorie calorie);
+    void update(DbCalorie calorie);
 
 }
