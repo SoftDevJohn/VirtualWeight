@@ -17,27 +17,32 @@ import java.util.Map;
 import static com.costigan.virtualweight.Calorie.MFP_DATE_FORMAT;
 
 public class MfpScreenScraper implements ScreenScraper {
+
+    private String username;
+    private String password;
+
     public int calories = 0;
+
+
+
 
     /**
      * Return an object coontaining the list of Calories from the given date up to today.
-     * @param username
-     * @param password
      * @param fromDate
      * @return
      * @throws Exception
      */
     @Override
-    public TotalCalories getTotalCaloriesDateToToday(String username, String password, LocalDate fromDate) throws Exception {
+    public TotalCalories getTotalCaloriesDateToToday(LocalDate fromDate) throws Exception {
 
         LocalDate today = org.joda.time.LocalDate.now();
-        return getTotalCaloriesForDates(username, password, fromDate, today);
+        return getTotalCaloriesForDates(fromDate, today);
     }
 
 
-    private TotalCalories getTotalCaloriesForDates(String username, String password, LocalDate fromDate, LocalDate toDate) throws Exception {
+    private TotalCalories getTotalCaloriesForDates(LocalDate fromDate, LocalDate toDate) throws Exception {
         TotalCalories tc = new TotalCalories();
-        List<Calorie> list = getCaloriesForDates(username, password, fromDate, toDate);
+        List<Calorie> list = getCaloriesForDates(fromDate, toDate);
 
         tc.setNumberOfDaysBeforeToday(0);
         tc.setHistorticCaloriesIn(0);
@@ -63,10 +68,18 @@ public class MfpScreenScraper implements ScreenScraper {
         return tc;
     }
 
+
+
+
+
+
+
+
     /**
      * GOOD
+     * Replace with an explicit list.
      */
-    private List<Calorie> getCaloriesForDates(String username, String password, LocalDate fromDate, LocalDate toDate) throws Exception {
+    private List<Calorie> getCaloriesForDates(LocalDate fromDate, LocalDate toDate) throws Exception {
         List<Calorie> list = new ArrayList<Calorie>();
         String url = VwConstants.URL_LOGIN;
 
@@ -87,7 +100,7 @@ public class MfpScreenScraper implements ScreenScraper {
             list.add(calorie);
 
             Document doc2 = Jsoup
-                    .connect(getUrl(username,searchDate))
+                    .connect(getUrl(searchDate))
                     .cookies(cookies)
                     .get();
 
@@ -146,8 +159,16 @@ public class MfpScreenScraper implements ScreenScraper {
         return list;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @NonNull
-    private String getUrl(String username,LocalDate searchDate) {
+    private String getUrl(LocalDate searchDate) {
 
         String mfpDate = searchDate.toString(MFP_DATE_FORMAT);
 //        return VwConstants.URL_QUERY+VwConstants.USERNAME+"?from=2018-10-29&to=2018-10-29";

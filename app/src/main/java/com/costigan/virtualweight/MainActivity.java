@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Open the Settings Screem
 //        Intent intent = new Intent(this, DatabaseActivity.class);
-//        startActivityForResult(intent, 1);
+        //String username, String password//        startActivityForResult(intent, 1);
 
         Intent intent = new Intent(this, DatabaseListActivity.class);
         startActivityForResult(intent, 1);
@@ -304,11 +304,16 @@ public class MainActivity extends AppCompatActivity {
         WeightResultDto dto = vw.getWeight();
         final ScreenScraper ss = new MfpScreenScraper();
 
+
         try {
             //final to allow the child chread to access it
             final VwSettings settings = getVwSettings();
             calculator.setSettings(settings);
             LocalDate dayAfterStartDate = settings.getDayAfterStartDate();
+
+            ((MfpScreenScraper) ss).setUsername(settings.getUserName());
+            ((MfpScreenScraper) ss).setPassword(settings.getPassword());
+
 
             ///Run this in a seperate thread
             // Otherwise, activity main thread will throw exception.
@@ -316,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     try {
-                        final TotalCalories total = ss.getTotalCaloriesDateToToday(calculator.getSettings().getUserName(), calculator.getSettings().getPassword(), calculator.getSettings().getDayAfterStartDate());
+                        final TotalCalories total = ss.getTotalCaloriesDateToToday(calculator.getSettings().getDayAfterStartDate());
 
                         //The child tread cannot update the UI  directly, otherwise we get:
                         // Only the original thread that created a view hierarchy can touch its views.

@@ -7,5 +7,5 @@ import org.joda.time.LocalDate;
  * calories.
  */
 public interface ScreenScraper {
-    public TotalCalories getTotalCaloriesDateToToday(String username, String password, LocalDate fromDate) throws Exception;
+    public TotalCalories getTotalCaloriesDateToToday(LocalDate fromDate) throws Exception;
     }
