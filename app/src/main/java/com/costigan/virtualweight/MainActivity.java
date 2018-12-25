@@ -408,8 +408,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
 //Temp out for release
-//        List<DbCalorie> dbCalorieList = convertCaloriesToDbCalories(calorieList);
-//        mCalorieViewModel.overwriteAllCalories(dbCalorieList);
+        List<DbCalorie> dbCalorieList = convertCaloriesToDbCalories(calorieList);
+        mCalorieViewModel.overwriteAllCalories(dbCalorieList);
 
         final VwSettings vws = calculator.getSettings();
         calculator.setTotal(total);
