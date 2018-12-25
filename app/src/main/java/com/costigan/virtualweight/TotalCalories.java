@@ -138,7 +138,7 @@ public class TotalCalories implements Serializable {
     }
 
 
-    public static TotalCalories toTotalCalories(List<Calorie> list) throws Exception {
+    public static TotalCalories toTotalCalories(List<Calorie> list) {
         TotalCalories tc = new TotalCalories();
 
 

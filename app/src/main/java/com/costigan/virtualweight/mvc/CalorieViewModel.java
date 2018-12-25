@@ -55,7 +55,7 @@ public class CalorieViewModel extends AndroidViewModel {
         for (int n = 0; n < calories.size(); n++) {
             DbCalorie c = calories.get(n);
             if (c.getWord().equals(calorie.getWord())) {
-                return false;
+                return true;
             }
         }
         return false;

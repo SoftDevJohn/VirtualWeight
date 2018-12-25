@@ -428,8 +428,8 @@ public class MainActivity extends AppCompatActivity {
 //                        final TotalCalories total = ss.getTotalCaloriesDateToToday(calculator.getSettings().getDayAfterStartDate());
 ////
                         List<LocalDate> dates = getListOfDatesUptoToday(calculator.getSettings().getDayAfterStartDate());
-                        List<Calorie> calorieList =  ss.getCaloriesForDateList(dates);
-                        final TotalCalories total = TotalCalories.toTotalCalories(calorieList);
+                        final List<Calorie> calorieList =  ss.getCaloriesForDateList(dates);
+                        //final TotalCalories total = TotalCalories.toTotalCalories(calorieList);
 ////
 
 
@@ -442,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                sendChildThreadMessageToMainThread(RetreiveCaloriesStatus.SUCCESS, "", total);
+                                sendChildThreadMessageToMainThread(RetreiveCaloriesStatus.SUCCESS, "", calorieList);
                             }
                         });
 
@@ -461,8 +461,7 @@ public class MainActivity extends AppCompatActivity {
                     ;
                 }
             };
-
-            statusTextView.setText("Retrieving calories, please wait...");
+statusTextView.setText("Retrieving calories, please wait...");
             okHttpExecuteThread.start();
 
         } catch (Exception ex) {
@@ -481,9 +480,18 @@ public class MainActivity extends AppCompatActivity {
         return new VwSettings(stringBuffer.toString().trim());
     }
 
+
+
+    ////////////////////
     // Send message from child thread to activity main thread.
     // Because can not modify UI controls in child thread directly.
-    private void sendChildThreadMessageToMainThread(RetreiveCaloriesStatus status, String rspMsg, TotalCalories total) {
+    //private void sendChildThreadMessageToMainThread(RetreiveCaloriesStatus status, String rspMsg, TotalCalories total) {
+    private void sendChildThreadMessageToMainThread(RetreiveCaloriesStatus status, String rspMsg, List<Calorie> calorieList) {
+        final TotalCalories total = TotalCalories.toTotalCalories(calorieList);
+
+
+
+
         if (status == RetreiveCaloriesStatus.UNKNOWN_HOST) {
             statusTextView.setText("Unable to connect to retrieve calories");
             return;
@@ -493,6 +501,28 @@ public class MainActivity extends AppCompatActivity {
             statusTextView.setText("Unable to retrieve calories. (TotalCalories is null)");
             return;
         }
+
+
+        //Save calories to database
+        /*
+        List<DbCalorie> dbCalorieList = new ArrayList<DbCalorie>();
+        DbCalorie calorie;
+        calorie = new DbCalorie("2018-01-01",10001,20001);
+        dbCalorieList.add(calorie);
+        calorie = new DbCalorie("2018-01-02",10002,20002);
+        dbCalorieList.add(calorie);
+        calorie = new DbCalorie("2018-01-03",10003,20003);
+        dbCalorieList.add(calorie);
+        mCalorieViewModel.overwriteAllCalories(dbCalorieList);
+        */
+        List<DbCalorie> dbCalorieList = convertCaloriesToDbCalories(calorieList);
+        mCalorieViewModel.overwriteAllCalories(dbCalorieList);
+
+
+
+        ////////////////
+        ////////////////
+
 
         final VwSettings vws = calculator.getSettings();
         calculator.setTotal(total);
@@ -506,6 +536,18 @@ public class MainActivity extends AppCompatActivity {
             statusTextView.setText("Unable to retreive calories. Check internet connection and login credentials");
         }
     }
+
+    //TODO: This may not be necessary if we merge Calorie and DbCalorie (as DbCalorie is only a normla POJO)
+    List<DbCalorie> convertCaloriesToDbCalories(List<Calorie> calorieList){
+        List<DbCalorie> dbCalories = new ArrayList<DbCalorie>();
+        for( Calorie cal : calorieList){
+            DbCalorie dbCal = new DbCalorie(cal.getDateAsMfpString(),cal.getCaloriesIn(),cal.getCaloriesOut());
+            dbCalories.add(dbCal);
+        }
+
+        return dbCalories;
+    }
+
 
     // Send message from child thread to activity main thread.
     // Because can not modify UI controls in child thread directly.

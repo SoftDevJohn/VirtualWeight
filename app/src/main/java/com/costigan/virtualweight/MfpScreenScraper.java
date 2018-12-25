@@ -127,6 +127,9 @@ public class MfpScreenScraper implements ScreenScraper {
         // now iterate over each date
         for (LocalDate searchDate : retrievalDates) {
             Calorie calorie = new Calorie();
+            calorie.setDate(searchDate);
+
+
             list.add(calorie);
 
             Document doc2 = Jsoup
