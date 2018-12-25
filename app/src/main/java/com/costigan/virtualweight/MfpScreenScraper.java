@@ -40,24 +40,24 @@ public class MfpScreenScraper implements ScreenScraper {
         }
 
 
-
+///Remove
     /**
      * Return an object coontaining the list of Calories from the given date up to today.
      * @param fromDate
      * @return
      * @throws Exception
      */
-    @Override
-    public TotalCalories getTotalCaloriesDateToToday(LocalDate fromDate) throws Exception {
+    //@Override
+    public TotalCalories XXXgetTotalCaloriesDateToToday(LocalDate fromDate) throws Exception {
 
         LocalDate today = org.joda.time.LocalDate.now();
-        return getTotalCaloriesForDates(fromDate, today);
+        return XXgetTotalCaloriesForDates(fromDate, today);
     }
 
 
-    private TotalCalories getTotalCaloriesForDates(LocalDate fromDate, LocalDate toDate) throws Exception {
+    private TotalCalories XXgetTotalCaloriesForDates(LocalDate fromDate, LocalDate toDate) throws Exception {
         TotalCalories tc = new TotalCalories();
-        List<Calorie> list = getCaloriesForDateRange(fromDate, toDate);
+        List<Calorie> list = XXgetCaloriesForDateRange(fromDate, toDate);
 
         tc.setNumberOfDaysBeforeToday(0);
         tc.setHistorticCaloriesIn(0);
@@ -84,6 +84,7 @@ public class MfpScreenScraper implements ScreenScraper {
     }
 
 
+
     /**
      * Create a list of dates for the given parameters.
      * @param fromDate
@@ -91,7 +92,7 @@ public class MfpScreenScraper implements ScreenScraper {
      * @return
      * @throws Exception
      */
-    private List<Calorie> getCaloriesForDateRange(LocalDate fromDate, LocalDate toDate) throws Exception {
+    private List<Calorie> XXgetCaloriesForDateRange(LocalDate fromDate, LocalDate toDate) throws Exception {
 
         List<LocalDate> retrievalDates =  new ArrayList<LocalDate>();
         for (LocalDate searchDate = fromDate; (searchDate.isBefore(toDate) || searchDate.isEqual(toDate)); searchDate = searchDate.plusDays(1)) {
@@ -107,6 +108,7 @@ public class MfpScreenScraper implements ScreenScraper {
      * GOOD
      * Replace with an explicit list.
      */
+    @Override
     public List<Calorie> getCaloriesForDateList(List<LocalDate> retrievalDates) throws Exception {
         List<Calorie> list = new ArrayList<Calorie>();
         String url = VwConstants.URL_LOGIN;

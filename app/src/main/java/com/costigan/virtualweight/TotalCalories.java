@@ -6,6 +6,7 @@ import org.joda.time.LocalDate;
 
 import java.io.Serializable;
 import java.util.Calendar;
+import java.util.List;
 
 public class TotalCalories implements Serializable {
 
@@ -135,6 +136,37 @@ public class TotalCalories implements Serializable {
     public void setStatus(int status) {
         this.status = status;
     }
+
+
+    public static TotalCalories toTotalCalories(List<Calorie> list) throws Exception {
+        TotalCalories tc = new TotalCalories();
+
+
+        tc.setNumberOfDaysBeforeToday(0);
+        tc.setHistorticCaloriesIn(0);
+        tc.setHistoricCaloriesOut(0);
+
+        //Get all calories up to yesterday
+        for (int i = 0; i < (list.size() - 1); i++) {
+            Calorie cal = list.get(i);
+            tc.setNumberOfDaysBeforeToday(tc.getNumberOfDaysBeforeToday() + 1);
+            tc.setHistorticCaloriesIn(tc.getHistorticCaloriesIn() + cal.getCaloriesIn());
+            tc.setHistoricCaloriesOut(tc.getHistoricCaloriesOut() + cal.getCaloriesOut());
+            tc.setLatestDateMidnightBeforeToday(cal.getDate()); //Take the last date before today
+        }
+
+        //Now get todays calories
+        if (list.size() >= 1) {
+            Calorie cal = list.get(list.size() - 1);
+            tc.setToday(cal.getDate());
+            tc.setTodayCaloriesIn(cal.getCaloriesIn());
+            tc.setTodayCaloriesOut(cal.getCaloriesOut());
+        } else {
+        }
+        return tc;
+    }
+
+
 
     @Override
     public String toString() {

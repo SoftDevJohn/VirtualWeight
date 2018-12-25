@@ -222,6 +222,21 @@ public class MainActivity extends AppCompatActivity {
         dbCalorieList.add(calorie);
         mCalorieViewModel.overwriteAllCalories(dbCalorieList);
 
+        //TODO
+        //A lot of the functionality in cakculateWeight will have to be moved here
+        //CalculateWeight will determine which dates are missing from the start date
+        //and always todays date.
+        //And then write those values back to today
+        //It will then do the calculation from the local database
+
+        //The method will create a list of dates from the start date to now
+        //and retrieve all the calories
+
+
+
+
+
+
                     /*
             mDao.deleteAll();
 
@@ -345,6 +360,44 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+// Factoring=oriing out calculation
+//Do TotalCalories calculation here
+    public TotalCalories newTestCode(LocalDate fromDate) throws Exception {
+        List<LocalDate> dates = getListOfDatesUptoToday(fromDate);
+        List<Calorie> calorieList =  ss.getCaloriesForDateList(dates);
+        return TotalCalories.toTotalCalories(calorieList);
+
+    }
+
+
+    public List<LocalDate> getListOfDatesUptoToday(LocalDate fromDate) throws Exception {
+        LocalDate today = org.joda.time.LocalDate.now();
+        return getListOfDatesForRange(fromDate, today);
+    }
+
+
+
+
+    /**
+     * Create a list of dates for the given parameters.
+     * @param fromDate
+     * @param toDate
+     * @return A list of Dates for the given date range
+     * @throws Exception
+     */
+    private List<LocalDate> getListOfDatesForRange(LocalDate fromDate, LocalDate toDate) throws Exception {
+        List<LocalDate> retrievalDates =  new ArrayList<LocalDate>();
+        for (LocalDate searchDate = fromDate; (searchDate.isBefore(toDate) || searchDate.isEqual(toDate)); searchDate = searchDate.plusDays(1)) {
+            retrievalDates.add(searchDate);
+        }
+
+        return retrievalDates;
+
+    }
+
 
     //Testing threading
     public void calculateWeight() {
@@ -372,7 +425,16 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     try {
-                        final TotalCalories total = ss.getTotalCaloriesDateToToday(calculator.getSettings().getDayAfterStartDate());
+//                        final TotalCalories total = ss.getTotalCaloriesDateToToday(calculator.getSettings().getDayAfterStartDate());
+////
+                        List<LocalDate> dates = getListOfDatesUptoToday(calculator.getSettings().getDayAfterStartDate());
+                        List<Calorie> calorieList =  ss.getCaloriesForDateList(dates);
+                        final TotalCalories total = TotalCalories.toTotalCalories(calorieList);
+////
+
+
+
+
 
                         //The child tread cannot update the UI  directly, otherwise we get:
                         // Only the original thread that created a view hierarchy can touch its views.
