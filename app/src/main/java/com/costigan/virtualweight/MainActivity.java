@@ -9,8 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,6 +23,7 @@ import com.costigan.virtualweight.ui.DatabaseListActivity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import java.io.FileNotFoundException;
@@ -46,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private ScreenScraper ss;
     private CalorieViewModel mCalorieViewModel;
 
-
-
     //https://www.livestrong.com/article/519568-does-slim-fast-curb-your-appetite/?ajax=1&is=1
     //3 X 650 meals + 2 x 200 snacks
     private static final int MAX_MEAL_CALORIES = 650;
@@ -60,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
     TextView owTv = null;
     TextView nmTv = null;
     TextView rTv = null;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,21 +105,6 @@ public class MainActivity extends AppCompatActivity {
                 //statusTextView.setText("Settings");
                 browseDb();
                 return true;
-            case R.id.restore:
-                //Overwrite the database
-                statusTextView.setText("Overwrite the database");
-                restoreDb();
-                //browseDb();
-                return true;
-
-                //            case R.id.test:
-//                //https://codelabs.developers.google.com/codelabs/android-room-with-a-view/#0
-//                statusTextView.setText("Test");
-//                RecyclerView recyclerView = findViewById(R.id.recyclerview);
-//                final WordListAdapter adapter = new WordListAdapter(this);
-//                recyclerView.setAdapter(adapter);
-//                recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -166,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
     private void restoreState() {
         Context context = getApplicationContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-//        Gson gson = new Gson();
         Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
                 .registerTypeAdapter(LocalDate.class, new GsonLocalDateDeserializerAdapter())
@@ -196,60 +176,9 @@ public class MainActivity extends AppCompatActivity {
      * Called when the user taps the Weigh In button
      */
     public void browseDb() {
-
-        //Open the Settings Screem
-//        Intent intent = new Intent(this, DatabaseActivity.class);
-        //String username, String password//        startActivityForResult(intent, 1);
-
         Intent intent = new Intent(this, DatabaseListActivity.class);
         startActivityForResult(intent, 1);
-
-
     }
-
-    /**
-     * Destroy database and overwrite with all values from Mfp
-     *
-     */
-    public void restoreDb() {
-        List<DbCalorie> dbCalorieList = new ArrayList<DbCalorie>();
-        DbCalorie calorie;
-        calorie = new DbCalorie("2018-01-01",10001,20001);
-        dbCalorieList.add(calorie);
-        calorie = new DbCalorie("2018-01-02",10002,20002);
-        dbCalorieList.add(calorie);
-        calorie = new DbCalorie("2018-01-03",10003,20003);
-        dbCalorieList.add(calorie);
-        mCalorieViewModel.overwriteAllCalories(dbCalorieList);
-
-        //TODO
-        //A lot of the functionality in cakculateWeight will have to be moved here
-        //CalculateWeight will determine which dates are missing from the start date
-        //and always todays date.
-        //And then write those values back to today
-        //It will then do the calculation from the local database
-
-        //The method will create a list of dates from the start date to now
-        //and retrieve all the calories
-
-
-
-
-
-
-                    /*
-            mDao.deleteAll();
-
-            DbCalorie calorie = new DbCalorie("2018-01-01",100,200);
-            mDao.insert(calorie);
-            calorie = new DbCalorie("2018-01-02",150,300);
-            mDao.insert(calorie);
-            */
-
-
-    }
-
-
 
     /**
      * Called when the user taps the Weigh In button
@@ -258,8 +187,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Open the Settings Screem
         Intent intent = new Intent(this, DisplaySettingsActivity.class);
-        //EditText editText = (EditText) findViewById(R.id.editText);
-        //String message = editText.getText().toString();
         Context ctx = getApplicationContext();
         VwFileManager fm = new VwFileManager();
         try {
@@ -295,8 +222,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
     //Handle the results from the Update settings dialog
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -330,8 +255,7 @@ public class MainActivity extends AppCompatActivity {
         String overWeightMsg = String.format("%.2f kg (%.0f kcal or %.0f %%)", Math.abs(stats.overweight), Math.abs(stats.overweightCalories), Math.abs(stats.overweightPercentage));
 
         if (stats.minutesToNextMeal > 0) {
-            String nextMeal = stats.now.plusMinutes((int) stats.minutesToNextMeal).toString("EEE dd/MMM/YYYY HH:mm");
-            String nextMealMsg = String.format("(Within target mealtime: %s)", nextMeal);
+            String nextMealMsg = String.format("(Within target mealtime: %s)", getTargetDateTimeAsString(stats.minutesToNextMeal));
             nmTv.setText(nextMealMsg);
             nmTv.setTextColor(Color.rgb(255, 155, 0));
         } else {
@@ -343,12 +267,13 @@ public class MainActivity extends AppCompatActivity {
             owTv.setText("You are overweight by: " + overWeightMsg);
             owTv.setTextColor(Color.RED);
 
-            String safeDateToTarget = stats.now.plusDays((int) stats.days).toString("dd/MMM/YYYY");
-            String fastDateToTarget = stats.now.plusMinutes((int) stats.fastingMinutes).toString("EEE dd/MMM/YYYY HH:mm");
+            String safeDateToTarget = getTargetDateTimeAsString(stats.minutes);
+            String fastDateToTarget = getTargetDateTimeAsString(stats.fastingMinutes);
+
             String recommendationMsg = String.format("To reach target, you need to:" +
                             "\n\t\t1) safely lose weight for %.0f days (%s); or" +
                             "\n\t\t2) fast for %.1f days until %s.",
-                    stats.days, safeDateToTarget, (stats.fastingMinutes / 60 / 24), fastDateToTarget);
+                    (stats.minutes/60/24), safeDateToTarget, (stats.fastingMinutes / 60 / 24), fastDateToTarget);
 
             rTv.setText(recommendationMsg);
             rTv.setTextColor(Color.rgb(255, 155, 0));
@@ -360,26 +285,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-//////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////
-// Factoring=oriing out calculation
-//Do TotalCalories calculation here
-    public TotalCalories newTestCode(LocalDate fromDate) throws Exception {
-        List<LocalDate> dates = getListOfDatesUptoToday(fromDate);
-        List<Calorie> calorieList =  ss.getCaloriesForDateList(dates);
-        return TotalCalories.toTotalCalories(calorieList);
 
+    public String getTargetDateTimeAsString(double minutesToNextMeal) {
+        String nextMeal = "";
+        DateTime dtNextMeal = DateTime.now().plusMinutes((int) minutesToNextMeal);
+        if (dtNextMeal.toLocalDate().equals(LocalDate.now())) {
+            nextMeal = "today at " + dtNextMeal.toString("HH:mm");
+        } else if (dtNextMeal.toLocalDate().equals(LocalDate.now().plusDays(1))) {
+            nextMeal = "tomorrow at " + dtNextMeal.toString("HH:mm");
+        } else {
+            nextMeal = dtNextMeal.toString("EEE dd/MMM/YYYY HH:mm");
+        }
+        return nextMeal;
     }
 
-
-    public List<LocalDate> getListOfDatesUptoToday(LocalDate fromDate) throws Exception {
+    private List<LocalDate> getListOfDatesUptoToday(LocalDate fromDate) throws Exception {
         LocalDate today = org.joda.time.LocalDate.now();
         return getListOfDatesForRange(fromDate, today);
     }
-
-
-
 
     /**
      * Create a list of dates for the given parameters.
@@ -399,15 +322,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //Testing threading
     public void calculateWeight() {
 
         VirtualWeight vw = new VirtualWeight();
         vw.calcuateWeight();
         WeightResultDto dto = vw.getWeight();
-
-        //final ScreenScraper ss = new MfpScreenScraper();
-
 
         try {
             //final to allow the child chread to access it
@@ -418,23 +337,14 @@ public class MainActivity extends AppCompatActivity {
             ((MfpScreenScraper) ss).setUsername(settings.getUserName());
             ((MfpScreenScraper) ss).setPassword(settings.getPassword());
 
-
             ///Run this in a seperate thread
             // Otherwise, activity main thread will throw exception.
             Thread okHttpExecuteThread = new Thread() {
                 @Override
                 public void run() {
                     try {
-//                        final TotalCalories total = ss.getTotalCaloriesDateToToday(calculator.getSettings().getDayAfterStartDate());
-////
                         List<LocalDate> dates = getListOfDatesUptoToday(calculator.getSettings().getDayAfterStartDate());
                         final List<Calorie> calorieList =  ss.getCaloriesForDateList(dates);
-                        //final TotalCalories total = TotalCalories.toTotalCalories(calorieList);
-////
-
-
-
-
 
                         //The child tread cannot update the UI  directly, otherwise we get:
                         // Only the original thread that created a view hierarchy can touch its views.
@@ -461,7 +371,8 @@ public class MainActivity extends AppCompatActivity {
                     ;
                 }
             };
-statusTextView.setText("Retrieving calories, please wait...");
+
+            statusTextView.setText("Retrieving calories, please wait...");
             okHttpExecuteThread.start();
 
         } catch (Exception ex) {
@@ -480,17 +391,11 @@ statusTextView.setText("Retrieving calories, please wait...");
         return new VwSettings(stringBuffer.toString().trim());
     }
 
-
-
-    ////////////////////
     // Send message from child thread to activity main thread.
     // Because can not modify UI controls in child thread directly.
     //private void sendChildThreadMessageToMainThread(RetreiveCaloriesStatus status, String rspMsg, TotalCalories total) {
     private void sendChildThreadMessageToMainThread(RetreiveCaloriesStatus status, String rspMsg, List<Calorie> calorieList) {
         final TotalCalories total = TotalCalories.toTotalCalories(calorieList);
-
-
-
 
         if (status == RetreiveCaloriesStatus.UNKNOWN_HOST) {
             statusTextView.setText("Unable to connect to retrieve calories");
@@ -502,27 +407,9 @@ statusTextView.setText("Retrieving calories, please wait...");
             return;
         }
 
-
-        //Save calories to database
-        /*
-        List<DbCalorie> dbCalorieList = new ArrayList<DbCalorie>();
-        DbCalorie calorie;
-        calorie = new DbCalorie("2018-01-01",10001,20001);
-        dbCalorieList.add(calorie);
-        calorie = new DbCalorie("2018-01-02",10002,20002);
-        dbCalorieList.add(calorie);
-        calorie = new DbCalorie("2018-01-03",10003,20003);
-        dbCalorieList.add(calorie);
-        mCalorieViewModel.overwriteAllCalories(dbCalorieList);
-        */
-        List<DbCalorie> dbCalorieList = convertCaloriesToDbCalories(calorieList);
-        mCalorieViewModel.overwriteAllCalories(dbCalorieList);
-
-
-
-        ////////////////
-        ////////////////
-
+//Temp out for release
+//        List<DbCalorie> dbCalorieList = convertCaloriesToDbCalories(calorieList);
+//        mCalorieViewModel.overwriteAllCalories(dbCalorieList);
 
         final VwSettings vws = calculator.getSettings();
         calculator.setTotal(total);

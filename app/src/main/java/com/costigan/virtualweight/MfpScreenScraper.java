@@ -23,84 +23,18 @@ public class MfpScreenScraper implements ScreenScraper {
 
     public int calories = 0;
 
+    //Singleton patter
+    private static MfpScreenScraper instance;
 
-
-
-        //Singleton patter
-        private static MfpScreenScraper instance;
-
-        //Prevent deafult constrction
-        private MfpScreenScraper(){}
-
-        public static MfpScreenScraper getInstance(){
-            if(instance == null){
-                instance = new MfpScreenScraper();
-            }
-            return instance;
-        }
-
-
-///Remove
-    /**
-     * Return an object coontaining the list of Calories from the given date up to today.
-     * @param fromDate
-     * @return
-     * @throws Exception
-     */
-    //@Override
-    public TotalCalories XXXgetTotalCaloriesDateToToday(LocalDate fromDate) throws Exception {
-
-        LocalDate today = org.joda.time.LocalDate.now();
-        return XXgetTotalCaloriesForDates(fromDate, today);
+    //Prevent deafult constrction
+    private MfpScreenScraper() {
     }
 
-
-    private TotalCalories XXgetTotalCaloriesForDates(LocalDate fromDate, LocalDate toDate) throws Exception {
-        TotalCalories tc = new TotalCalories();
-        List<Calorie> list = XXgetCaloriesForDateRange(fromDate, toDate);
-
-        tc.setNumberOfDaysBeforeToday(0);
-        tc.setHistorticCaloriesIn(0);
-        tc.setHistoricCaloriesOut(0);
-
-        //Get all calories up to yesterday
-        for (int i = 0; i < (list.size() - 1); i++) {
-            Calorie cal = list.get(i);
-            tc.setNumberOfDaysBeforeToday(tc.getNumberOfDaysBeforeToday() + 1);
-            tc.setHistorticCaloriesIn(tc.getHistorticCaloriesIn() + cal.getCaloriesIn());
-            tc.setHistoricCaloriesOut(tc.getHistoricCaloriesOut() + cal.getCaloriesOut());
-            tc.setLatestDateMidnightBeforeToday(cal.getDate()); //Take the last date before today
+    public static MfpScreenScraper getInstance() {
+        if (instance == null) {
+            instance = new MfpScreenScraper();
         }
-
-        //Now get todays calories
-        if (list.size() >= 1) {
-            Calorie cal = list.get(list.size() - 1);
-            tc.setToday(cal.getDate());
-            tc.setTodayCaloriesIn(cal.getCaloriesIn());
-            tc.setTodayCaloriesOut(cal.getCaloriesOut());
-        } else {
-        }
-        return tc;
-    }
-
-
-
-    /**
-     * Create a list of dates for the given parameters.
-     * @param fromDate
-     * @param toDate
-     * @return
-     * @throws Exception
-     */
-    private List<Calorie> XXgetCaloriesForDateRange(LocalDate fromDate, LocalDate toDate) throws Exception {
-
-        List<LocalDate> retrievalDates =  new ArrayList<LocalDate>();
-        for (LocalDate searchDate = fromDate; (searchDate.isBefore(toDate) || searchDate.isEqual(toDate)); searchDate = searchDate.plusDays(1)) {
-            retrievalDates.add(searchDate);
-        }
-
-        return getCaloriesForDateList(retrievalDates);
-
+        return instance;
     }
 
 

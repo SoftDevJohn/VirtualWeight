@@ -95,7 +95,7 @@ class CalorieCalculator {
         stats.overweightPercentage = (stats.overweight / targetWeight) * 100;
         stats.maxSafeWeightLoss = 750; //kcal = 0.7 kg / week = 1.7 lbs week
 
-        stats.days = stats.overweightCalories / stats.maxSafeWeightLoss;
+        stats.minutes = (stats.overweightCalories / stats.maxSafeWeightLoss)*60*24;
         stats.fastingMinutes = (stats.overweightCalories / bmr) * 60 * 24;
         stats.minutesToNextMeal = ((stats.overweightCalories + MAX_MEAL_CALORIES) / bmr) * 60 * 24;
         stats.now = DateTime.now();
@@ -107,7 +107,7 @@ class CalorieCalculator {
         double overweightCalories;
         double overweightPercentage;
         double maxSafeWeightLoss;
-        double days;
+        double minutes;
         double fastingMinutes;
         double minutesToNextMeal;
         DateTime now;
