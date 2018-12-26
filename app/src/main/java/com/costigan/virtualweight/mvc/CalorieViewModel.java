@@ -45,7 +45,6 @@ public class CalorieViewModel extends AndroidViewModel {
 
     }
 
-/*
     private boolean contains(DbCalorie calorie) {
         LiveData<List<DbCalorie>> mAllWords = mRepository.getAllWords();
         List<DbCalorie> calories = mAllWords.getValue();
@@ -74,7 +73,7 @@ public class CalorieViewModel extends AndroidViewModel {
             mRepository.insert(calorie);
         }
     }
-*/
+
     public void overwriteAllCalories(final List<DbCalorie> dbCalorieList){
         mRepository.overwriteAllCalories(dbCalorieList);
         /*

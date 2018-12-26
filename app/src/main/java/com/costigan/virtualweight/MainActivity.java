@@ -90,12 +90,38 @@ public class MainActivity extends AppCompatActivity {
         // in the foreground.
         mCalorieViewModel.getAllWords().observe(this, new Observer<List<DbCalorie>>() {
             @Override
-            public void onChanged(@Nullable final List<DbCalorie> calories) {
+            public void onChanged(@Nullable final List<DbCalorie> dbCalories) {
                 // Update the cached copy of the calories in the adapter.
                 //adapter.setWords(calories);
                 //Update the display
                 int n = 0;
-                statusTextView.setText("Db changed: "+calories.size());
+                //statusTextView.setText("Db changed: "+dbCalories.size());
+                //TODO testing.
+                //TODO
+                final VwSettings vws = calculator.getSettings();
+                List<Calorie> calories =convertDbCaloriesToCalories(dbCalories);
+
+                TotalCalories total = TotalCalories.toTotalCalories(calories);
+
+//       TotalCalories total = new TotalCalories();
+//       total.setHistorticCaloriesIn(1);
+//       total.setHistoricCaloriesOut(2);
+//       total.setLatestDateMidnightBeforeToday(LocalDate.parse("2018-06-01"));
+//       total.setNumberOfDaysBeforeToday(2);
+//                total.setTodayCaloriesIn(101);
+//                total.setTodayCaloriesOut(102);
+
+        calculator.setTotal(total);
+
+        //statusTextView.setText("Response: " + rspMsg + "TC=" + calculator.getTotal());
+        //if (calculator.getTotal().getStatus() == TotalCalories.SUCCESS) {
+            refreshMainDisplay();
+            saveTotalCaloriesState();
+            statusTextView.setText("xxxxTC=" + calculator.getTotal());
+        //} else {
+        //    statusTextView.setText("Unable to retreive calories. Check internet connection and login credentials");
+        //}
+
 
 
             }
@@ -434,9 +460,9 @@ public class MainActivity extends AppCompatActivity {
 
         List<DbCalorie> dbCalorieList = convertCaloriesToDbCalories(calorieList);
         mCalorieViewModel.overwriteAllCalories(dbCalorieList);
-
+/*
         //TODO
-        /* defer to listener on DB
+        // defer to listener on DB
         final VwSettings vws = calculator.getSettings();
         calculator.setTotal(total);
 
@@ -448,7 +474,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             statusTextView.setText("Unable to retreive calories. Check internet connection and login credentials");
         }
-        */
+*/
     }
 
 
@@ -456,7 +482,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     //TODO: This may not be necessary if we merge Calorie and DbCalorie (as DbCalorie is only a normla POJO)
-    List<DbCalorie> convertCaloriesToDbCalories(List<Calorie> calorieList){
+    List<DbCalorie> convertCaloriesToDbCalories(List<Calorie>calorieList){
         List<DbCalorie> dbCalories = new ArrayList<DbCalorie>();
         for( Calorie cal : calorieList){
             DbCalorie dbCal = new DbCalorie(cal.getDateAsMfpString(),cal.getCaloriesIn(),cal.getCaloriesOut());
@@ -466,6 +492,19 @@ public class MainActivity extends AppCompatActivity {
         return dbCalories;
     }
 
+    //TODO: This may not be necessary if we merge Calorie and DbCalorie (as DbCalorie is only a normla POJO)
+    List<Calorie> convertDbCaloriesToCalories(List<DbCalorie>calorieList){
+        List<Calorie> calories = new ArrayList<Calorie>();
+        for( DbCalorie dbCal : calorieList){
+            Calorie cal = new Calorie();
+            cal.setDate(dbCal.getWord());
+            cal.setCaloriesIn(dbCal.getCaloriesIn());
+            cal.setCaloriesOut(dbCal.getCaloriesOut());
+            calories.add(cal);
+        }
+
+        return calories;
+    }
 
     // Send message from child thread to activity main thread.
     // Because can not modify UI controls in child thread directly.
