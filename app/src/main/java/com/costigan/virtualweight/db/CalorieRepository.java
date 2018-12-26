@@ -60,6 +60,23 @@ public class CalorieRepository {
 
     }
 
+
+    public void overwriteAllCalories(final List<DbCalorie> dbCalorieList){
+        executor.execute(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        mCalorieDao.deleteAll();
+                        for(DbCalorie calorie : dbCalorieList) {
+                            mCalorieDao.insert(calorie);
+                        }
+                    }
+                }
+        );
+
+    }
+
+
     public void deleteAll() {
         //new UpdateAsyncTask(mCalorieDao).execute(calorie);
         //new insertAsyncTask(mCalorieDao).execute(calorie);

@@ -31,7 +31,8 @@ public class CalorieViewModel extends AndroidViewModel {
         mAllWords = mRepository.getAllWords();
     }
 
-    public LiveData<List<DbCalorie>> getAllWords() {
+    public LiveData
+            <List<DbCalorie>> getAllWords() {
         return mAllWords;
     }
 
@@ -44,8 +45,8 @@ public class CalorieViewModel extends AndroidViewModel {
 
     }
 
-
-    public boolean contains(DbCalorie calorie) {
+/*
+    private boolean contains(DbCalorie calorie) {
         LiveData<List<DbCalorie>> mAllWords = mRepository.getAllWords();
         List<DbCalorie> calories = mAllWords.getValue();
         if( calories == null ){
@@ -58,6 +59,11 @@ public class CalorieViewModel extends AndroidViewModel {
                 return true;
             }
         }
+
+        // Java 8
+        //return calories.stream().anyMatch(c -> c.getWord().equals(calorie.getWord()) );
+
+
         return false;
     }
 
@@ -68,12 +74,15 @@ public class CalorieViewModel extends AndroidViewModel {
             mRepository.insert(calorie);
         }
     }
-
+*/
     public void overwriteAllCalories(final List<DbCalorie> dbCalorieList){
+        mRepository.overwriteAllCalories(dbCalorieList);
+        /*
         mRepository.deleteAll();
         for(DbCalorie calorie : dbCalorieList) {
             updateOrAdd(calorie);
         }
+        */
     }
 
 }
