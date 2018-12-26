@@ -23,12 +23,15 @@ So, we are leaving the template code in. -->
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.android.roomwordssample.com.costigan.virtualweight.MainActivity">
+    tools:context="com.costigan.virtualweight.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+
+        android:theme="@style/AppTheme.AppBarOverlay"
+
+        >
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
