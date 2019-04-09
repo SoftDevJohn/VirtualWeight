@@ -188,21 +188,26 @@ public class MainActivity extends AppCompatActivity {
 
         String json = preferences.getString(TotalCalories.TOTAL_CALORIES_OBJECT, "");
 
-        if (json.isEmpty()) {
-            //Object not found, so dont do anything
-            return;
-        }
-        TotalCalories tc = gson.fromJson(json, TotalCalories.class);
-
         try {
             VwSettings vws = getVwSettings();
+
+
+
+            TotalCalories tc;
+            if (!json.isEmpty()) {
+                tc = gson.fromJson(json, TotalCalories.class);
+                statusTextView.setText("Test persistence retrieved: " + tc.toString());
+            }else{
+                tc = new TotalCalories();
+                statusTextView.setText("No persistence retrieved, use default: " + tc.toString());
+            }
             calculator.setTotal(tc);
             calculator.setSettings(vws);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        statusTextView.setText("Test persistence retrieved: " + tc.toString());
+        //statusTextView.setText("Test persistence retrieved: " + tc.toString());
     }
 
     /**
@@ -422,8 +427,13 @@ public class MainActivity extends AppCompatActivity {
         //Now read from this file
         StringBuffer stringBuffer = new StringBuffer();
         Context ctx = getApplicationContext();
-        fm.readFile(ctx, VwFileManager.SETTINGS_FILE, stringBuffer);
-        return new VwSettings(stringBuffer.toString().trim());
+        try {
+            fm.readFile(ctx, VwFileManager.SETTINGS_FILE, stringBuffer);
+            return new VwSettings(stringBuffer.toString().trim());
+        }catch(FileNotFoundException fnf){
+            return new VwSettings();
+
+        }
     }
 
     // Send message from child thread to activity main thread.

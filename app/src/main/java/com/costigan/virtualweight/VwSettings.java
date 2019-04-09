@@ -27,6 +27,7 @@ public class VwSettings implements Serializable {
     public VwSettings(){
     }
 
+
     public VwSettings(String line) throws Exception{
         parseLine(this,line);
     }
